@@ -61,7 +61,7 @@ trait ProfileValidationRules
         return [
             'required_without:email',
             'nullable',
-            'regex:/^01[3-9][0-9]{8}$/',
+            'regex:/^(?:\+?880|0)1[3-9][0-9]{8}$/',
             $userId === null
                 ? Rule::unique(User::class)
                 : Rule::unique(User::class)->ignore($userId),

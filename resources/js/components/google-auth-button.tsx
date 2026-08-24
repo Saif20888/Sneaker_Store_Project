@@ -1,7 +1,13 @@
 import { Button } from '@/components/ui/button';
 import { redirect } from '@/routes/auth/google';
 
+export const GOOGLE_AUTH_ENABLED = false;
+
 export default function GoogleAuthButton() {
+    if (!GOOGLE_AUTH_ENABLED) {
+        return null;
+    }
+
     return (
         <Button asChild type="button" variant="outline" className="w-full">
             <a href={redirect().url}>

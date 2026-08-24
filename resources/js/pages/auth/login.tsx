@@ -1,5 +1,5 @@
 import { Form, Head } from '@inertiajs/react';
-import GoogleAuthButton from '@/components/google-auth-button';
+import GoogleAuthButton, { GOOGLE_AUTH_ENABLED } from '@/components/google-auth-button';
 import InputError from '@/components/input-error';
 import PasskeyVerify from '@/components/passkey-verify';
 import PasswordInput from '@/components/password-input';
@@ -110,12 +110,14 @@ export default function Login({
                                 Log in
                             </Button>
 
-                            <div className="relative text-center text-sm">
-                                <span className="relative z-10 bg-background px-2 text-muted-foreground">
-                                    Or continue with
-                                </span>
-                                <div className="absolute inset-x-0 top-1/2 -z-0 border-t border-border" />
-                            </div>
+                            {GOOGLE_AUTH_ENABLED && (
+                                <div className="relative text-center text-sm">
+                                    <span className="relative z-10 bg-background px-2 text-muted-foreground">
+                                        Or continue with
+                                    </span>
+                                    <div className="absolute inset-x-0 top-1/2 -z-0 border-t border-border" />
+                                </div>
+                            )}
 
                             <GoogleAuthButton />
                         </div>

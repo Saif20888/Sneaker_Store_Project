@@ -20,7 +20,7 @@ class StoreManualOrderRequest extends FormRequest
     {
         return [
             'customer_name' => ['required', 'string', 'max:255'],
-            'phone_number' => ['required', 'regex:/^01[3-9][0-9]{8}$/'],
+            'phone_number' => ['required', 'regex:/^(?:\+?880|0)1[3-9][0-9]{8}$/'],
             'city' => ['required', 'string', 'max:255'],
             'shipping_address' => ['required', 'string', 'max:1000'],
             'zone' => ['required', new Enum(DeliveryZone::class)],
@@ -42,7 +42,7 @@ class StoreManualOrderRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'phone_number.regex' => 'Enter a valid Bangladeshi mobile number (e.g. 01712345678).',
+            'phone_number.regex' => 'Enter a valid Bangladeshi mobile number (e.g. 01712345678 or +8801712345678).',
             'payment_transaction_id.required_unless' => 'Enter the transaction ID from the bKash/Nagad payment.',
         ];
     }
