@@ -50,6 +50,11 @@ function Thumbnail({ src }: { src: string }) {
                 <span className="absolute inset-0 animate-pulse bg-store-gray/60" />
             )}
             <img
+                ref={(el) => {
+                    if (el?.complete) {
+                        setLoaded(true);
+                    }
+                }}
                 src={src}
                 alt=""
                 onLoad={() => setLoaded(true)}

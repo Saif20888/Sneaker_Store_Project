@@ -6,6 +6,7 @@ use App\Enums\DeliveryZone;
 use App\Enums\PaymentMethod;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 
 class StoreOrderRequest extends FormRequest
@@ -23,7 +24,14 @@ class StoreOrderRequest extends FormRequest
             'city' => ['required', 'string', 'max:255'],
             'shipping_address' => ['required', 'string', 'max:1000'],
             'zone' => ['required', new Enum(DeliveryZone::class)],
-            'payment_method' => ['required', new Enum(PaymentMethod::class)],
+            'payment_method' => [
+                'required',
+                new Enum(PaymentMethod::class),
+                Rule::when(
+                    ! config('services.sslcommerz.enabled'),
+                    Rule::notIn([PaymentMethod::Sslcommerz->value]),
+                ),
+            ],
             'payment_transaction_id' => ['required_unless:payment_method,cod,sslcommerz', 'nullable', 'string', 'max:255'],
         ];
     }

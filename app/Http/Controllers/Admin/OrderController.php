@@ -19,12 +19,14 @@ use App\Models\ExchangeRecord;
 use App\Models\Order;
 use App\Models\OrderNote;
 use App\Models\Product;
+use App\Services\SteadfastService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
+use RuntimeException;
 
 class OrderController extends Controller
 {
@@ -152,6 +154,9 @@ class OrderController extends Controller
                 'delivery_fee' => $order->delivery_fee,
                 'actual_delivery_cost' => $order->actual_delivery_cost,
                 'delivery_profit' => $order->deliveryProfit(),
+                'steadfast_consignment_id' => $order->steadfast_consignment_id,
+                'steadfast_tracking_code' => $order->steadfast_tracking_code,
+                'steadfast_status' => $order->steadfast_status,
                 'subtotal' => $order->subtotal,
                 'total_amount' => $order->total_amount,
                 'payment_method' => $order->payment_method->label(),
@@ -289,5 +294,40 @@ class OrderController extends Controller
         ]);
 
         return back()->with('status', 'Delivery cost recorded.');
+    }
+
+    /**
+     * Create a SteadFast courier consignment for the given order, so it can be picked up
+     * and delivered. Skips silently if a consignment already exists for this order.
+     */
+    public function sendToSteadfast(Request $request, Order $order, SteadfastService $steadfast): RedirectResponse
+    {
+        if ($order->status === OrderStatus::Cancelled) {
+            throw ValidationException::withMessages([
+                'steadfast' => 'Cancelled orders cannot be sent to the courier.',
+            ]);
+        }
+
+        if ($order->steadfast_consignment_id !== null) {
+            return back()->with('status', 'Order was already sent to SteadFast.');
+        }
+
+        try {
+            $consignment = $steadfast->createOrder($order);
+        } catch (RuntimeException $e) {
+            throw ValidationException::withMessages(['steadfast' => $e->getMessage()]);
+        }
+
+        $order->steadfast_consignment_id = $consignment['consignment_id'];
+        $order->steadfast_tracking_code = $consignment['tracking_code'];
+        $order->steadfast_status = $consignment['status'];
+        $order->save();
+
+        $order->notes()->create([
+            'user_id' => $request->user()->id,
+            'note' => "Sent to SteadFast courier — tracking code {$consignment['tracking_code']}.",
+        ]);
+
+        return back()->with('status', 'Order sent to SteadFast.');
     }
 }

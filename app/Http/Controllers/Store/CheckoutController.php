@@ -29,10 +29,13 @@ class CheckoutController extends Controller
                 'label' => $zone->label(),
                 'fee' => $zone->fee(),
             ]),
-            'paymentMethods' => collect(PaymentMethod::cases())->map(fn (PaymentMethod $method) => [
-                'value' => $method->value,
-                'label' => $method->label(),
-            ]),
+            'paymentMethods' => collect(PaymentMethod::cases())
+                ->reject(fn (PaymentMethod $method) => $method === PaymentMethod::Sslcommerz && ! config('services.sslcommerz.enabled'))
+                ->map(fn (PaymentMethod $method) => [
+                    'value' => $method->value,
+                    'label' => $method->label(),
+                ])
+                ->values(),
         ]);
     }
 

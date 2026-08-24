@@ -29,6 +29,11 @@ export default function ImageMagnifier({ src, alt }: ImageMagnifierProps) {
                 <span className="absolute inset-0 animate-pulse bg-store-gray/50" />
             )}
             <img
+                ref={(el) => {
+                    if (el?.complete) {
+                        setLoaded(true);
+                    }
+                }}
                 src={src}
                 alt={alt}
                 onLoad={() => setLoaded(true)}

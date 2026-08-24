@@ -1,13 +1,24 @@
+import { usePage } from '@inertiajs/react';
+
 const WHATSAPP_NUMBER = '8801601638822';
 
 export default function WhatsAppFloat() {
+    const { url } = usePage();
+
+    // Product pages already have their own inline "Order via WhatsApp" button
+    // right next to the size/add-to-bag controls, so the floating button here
+    // would just overlap it on short mobile viewports.
+    if (url.startsWith('/sneakers/')) {
+        return null;
+    }
+
     return (
         <a
             href={`https://wa.me/${WHATSAPP_NUMBER}`}
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Chat with us on WhatsApp"
-            className="fixed right-4 bottom-4 z-50 flex size-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-black/20 transition-transform hover:scale-105 sm:right-6 sm:bottom-6"
+            className="fixed right-4 bottom-20 z-50 flex size-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-black/20 transition-transform hover:scale-105 sm:right-6 sm:bottom-6"
         >
             <svg
                 viewBox="0 0 32 32"

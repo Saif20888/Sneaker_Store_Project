@@ -28,6 +28,7 @@ Route::prefix('admin')
         Route::patch('orders/{order:order_number}/items', [OrderController::class, 'updateItems'])->name('orders.update-items');
         Route::patch('orders/{order:order_number}/delivery-cost', [OrderController::class, 'updateDeliveryCost'])->name('orders.update-delivery-cost');
         Route::post('orders/{order:order_number}/notes', [OrderController::class, 'storeNote'])->name('orders.notes.store');
+        Route::post('orders/{order:order_number}/steadfast', [OrderController::class, 'sendToSteadfast'])->name('orders.steadfast.send');
         Route::post('orders/{order:order_number}/exchanges', [ExchangeController::class, 'store'])->name('orders.exchanges.store');
 
         Route::get('reports', [ReportController::class, 'index'])->name('reports.index');

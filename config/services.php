@@ -42,6 +42,9 @@ return [
         'store_id' => env('SSLCOMMERZ_STORE_ID', 'testbox'),
         'store_password' => env('SSLCOMMERZ_STORE_PASSWORD', 'qwerty'),
         'sandbox' => env('SSLCOMMERZ_SANDBOX', true),
+        // Off by default until real live merchant credentials are set — sandbox creds
+        // can't process real payments, so the option stays hidden at checkout until then.
+        'enabled' => env('SSLCOMMERZ_ENABLED', false),
     ],
 
     // Requires your own OAuth app at https://console.cloud.google.com/apis/credentials —
@@ -50,6 +53,12 @@ return [
         'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
         'redirect' => env('GOOGLE_REDIRECT_URI'),
+    ],
+
+    'steadfast' => [
+        'api_key' => env('STEADFAST_API_KEY'),
+        'secret_key' => env('STEADFAST_SECRET_KEY'),
+        'base_url' => env('STEADFAST_BASE_URL', 'https://portal.packzy.com/api/v1'),
     ],
 
 ];

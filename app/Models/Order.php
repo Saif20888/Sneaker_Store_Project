@@ -29,6 +29,9 @@ use Illuminate\Support\Str;
  * @property DeliveryZone $zone
  * @property int $delivery_fee
  * @property int|null $actual_delivery_cost
+ * @property int|null $steadfast_consignment_id
+ * @property string|null $steadfast_tracking_code
+ * @property string|null $steadfast_status
  * @property int $subtotal
  * @property int $total_amount
  * @property PaymentMethod $payment_method

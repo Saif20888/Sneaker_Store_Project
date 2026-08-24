@@ -38,6 +38,11 @@ export default function ProductCard({ product }: { product: ProductCardData }) {
                                 <span className="absolute inset-0 animate-pulse bg-store-gray/50" />
                             )}
                             <img
+                                ref={(el) => {
+                                    if (el?.complete) {
+                                        setImageLoaded(true);
+                                    }
+                                }}
                                 src={image}
                                 alt={product.name}
                                 loading="lazy"

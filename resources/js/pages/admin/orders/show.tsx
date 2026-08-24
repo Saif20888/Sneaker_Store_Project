@@ -21,6 +21,7 @@ import {
 } from '@/routes/admin/orders';
 import { store as storeExchange } from '@/routes/admin/orders/exchanges';
 import { store as storeNote } from '@/routes/admin/orders/notes';
+import { send as sendToSteadfast } from '@/routes/admin/orders/steadfast';
 
 type OrderItemRow = {
     id: number;
@@ -60,6 +61,9 @@ type OrderShowProps = {
         delivery_fee: number;
         actual_delivery_cost: number | null;
         delivery_profit: number | null;
+        steadfast_consignment_id: number | null;
+        steadfast_tracking_code: string | null;
+        steadfast_status: string | null;
         subtotal: number;
         total_amount: number;
         payment_method: string;
@@ -187,6 +191,20 @@ export default function AdminOrderShow({
     const submitDeliveryCost = () => {
         deliveryCostForm.patch(updateDeliveryCost(order.order_number).url, {
             preserveScroll: true,
+        });
+    };
+
+    const steadfastForm = useForm({});
+    const [steadfastError, setSteadfastError] = useState<string | null>(null);
+
+    const submitSendToSteadfast = () => {
+        setSteadfastError(null);
+        steadfastForm.post(sendToSteadfast(order.order_number).url, {
+            preserveScroll: true,
+            onError: (errors) =>
+                setSteadfastError(
+                    Object.values(errors)[0] ?? 'Unable to send to SteadFast.',
+                ),
         });
     };
 
@@ -473,6 +491,60 @@ export default function AdminOrderShow({
                                     </p>
                                 )}
                             </div>
+                        </CardContent>
+                    </Card>
+                )}
+
+                {order.status !== 'cancelled' && (
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Courier (SteadFast)</CardTitle>
+                        </CardHeader>
+                        <CardContent className="flex flex-col gap-4">
+                            {order.steadfast_consignment_id !== null ? (
+                                <div className="flex flex-wrap gap-6 text-sm">
+                                    <div>
+                                        <p className="text-muted-foreground">
+                                            Consignment ID
+                                        </p>
+                                        <p className="font-medium">
+                                            {order.steadfast_consignment_id}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-muted-foreground">
+                                            Tracking code
+                                        </p>
+                                        <p className="font-medium">
+                                            {order.steadfast_tracking_code}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-muted-foreground">
+                                            Status
+                                        </p>
+                                        <p className="font-medium capitalize">
+                                            {order.steadfast_status}
+                                        </p>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="flex flex-wrap items-center gap-2">
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        disabled={steadfastForm.processing}
+                                        onClick={submitSendToSteadfast}
+                                    >
+                                        Send to SteadFast
+                                    </Button>
+                                    {steadfastError && (
+                                        <p className="w-full text-xs text-destructive">
+                                            {steadfastError}
+                                        </p>
+                                    )}
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
                 )}
