@@ -33,6 +33,7 @@ tar --exclude='vendor' \
     --exclude='dummy_data_export' \
     --exclude='.git' \
     --exclude='.env' \
+    --exclude='public/storage' \
     -czf "$TARBALL" .
 
 echo "==> Uploading to $VPS_HOST"
@@ -46,6 +47,8 @@ tar -xzf /tmp/deploy.tar.gz
 rm /tmp/deploy.tar.gz
 COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --optimize-autoloader --no-interaction
 php artisan migrate --force
+rm -f public/storage
+php artisan storage:link
 chown -R www-data:www-data /var/www/vintedge
 chmod -R 775 /var/www/vintedge/storage /var/www/vintedge/bootstrap/cache
 php artisan config:cache
