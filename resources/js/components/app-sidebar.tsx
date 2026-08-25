@@ -7,6 +7,7 @@ import {
     LayoutGrid,
     ShoppingBag,
     ShoppingCart,
+    Star,
     Tags,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
@@ -29,14 +30,19 @@ import { index as categoriesIndex } from '@/routes/admin/categories';
 import { index as ordersIndex } from '@/routes/admin/orders';
 import { index as productsIndex } from '@/routes/admin/products';
 import { index as reportsIndex } from '@/routes/admin/reports';
+import { index as reviewsIndex } from '@/routes/admin/reviews';
 import type { NavItem } from '@/types';
 
 export function AppSidebar() {
-    const page = usePage<{ pendingOrdersCount?: number }>();
+    const page = usePage<{
+        pendingOrdersCount?: number;
+        pendingReviewsCount?: number;
+    }>();
     const dashboardUrl = page.props.currentTeam
         ? dashboard(page.props.currentTeam.slug)
         : '/';
     const pendingOrdersCount = page.props.pendingOrdersCount ?? 0;
+    const pendingReviewsCount = page.props.pendingReviewsCount ?? 0;
 
     const mainNavItems: NavItem[] = [
         {
@@ -71,6 +77,14 @@ export function AppSidebar() {
             title: 'Reports',
             href: reportsIndex(),
             icon: BarChart3,
+        },
+        {
+            title:
+                pendingReviewsCount > 0
+                    ? `Reviews (${pendingReviewsCount})`
+                    : 'Reviews',
+            href: reviewsIndex(),
+            icon: Star,
         },
     ];
 

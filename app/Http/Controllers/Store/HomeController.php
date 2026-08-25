@@ -7,6 +7,7 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\HomeBanner;
 use App\Models\Product;
+use App\Models\Review;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -59,6 +60,11 @@ class HomeController extends Controller
                 ->orderBy('name')
                 ->take(8)
                 ->get(['name', 'slug', 'image']),
+            'reviews' => Review::query()
+                ->where('is_approved', true)
+                ->latest()
+                ->take(6)
+                ->get(['name', 'city', 'rating', 'comment']),
         ]);
     }
 }

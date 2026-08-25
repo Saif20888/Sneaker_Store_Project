@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Enums\OrderStatus;
 use App\Models\Category;
 use App\Models\Order;
+use App\Models\Review;
 use App\Support\Cart;
 use App\Support\Wishlist;
 use Illuminate\Http\Request;
@@ -60,6 +61,9 @@ class HandleInertiaRequests extends Middleware
             'storeCategories' => fn () => Category::query()->orderBy('name')->get(['id', 'name', 'slug']),
             'pendingOrdersCount' => fn () => $user?->is_admin
                 ? Order::query()->where('status', OrderStatus::Pending)->count()
+                : 0,
+            'pendingReviewsCount' => fn () => $user?->is_admin
+                ? Review::query()->where('is_approved', false)->count()
                 : 0,
         ];
     }

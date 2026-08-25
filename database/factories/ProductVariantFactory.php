@@ -20,7 +20,9 @@ class ProductVariantFactory extends Factory
     {
         return [
             'product_id' => Product::factory(),
-            'size' => fake()->randomElement(['40', '41', '42', '43', '44', '45']),
+            // unique() avoids the (product_id, size) collisions that occur when a test
+            // creates several variants for the same product without pinning sizes itself.
+            'size' => fake()->unique()->randomElement(['36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46']),
             'stock_quantity' => fake()->numberBetween(0, 20),
         ];
     }

@@ -5,9 +5,16 @@ import HeroCarousel from '@/components/hero-carousel';
 import ProductCard from '@/components/product-card';
 import type { ProductCardData } from '@/components/product-card';
 import { Button } from '@/components/ui/button';
+import WriteReviewModal from '@/components/write-review-modal';
 import { index as shopIndex } from '@/routes/products';
 
 type HomeCategory = { name: string; slug: string; image: string };
+type HomeReview = {
+    name: string;
+    city: string | null;
+    rating: number;
+    comment: string;
+};
 
 type HomeProps = {
     bestSellers: ProductCardData[];
@@ -16,6 +23,7 @@ type HomeProps = {
     brands: { id: number; name: string; slug: string }[];
     banners: string[];
     categories: HomeCategory[];
+    reviews: HomeReview[];
 };
 
 const BRAND_LOGOS: Record<string, string> = {
@@ -47,21 +55,28 @@ const WHY_CHOOSE_US = [
     },
 ];
 
-const REVIEWS = [
+// Shown only until real customer reviews are approved, so the section is never empty.
+const FALLBACK_REVIEWS: HomeReview[] = [
     {
         name: 'Rafiul Islam',
         city: 'Dhaka',
-        quote: 'Copped the SB Dunk Low J-Pack Shadow and it arrived next day, exactly as pictured. COD made it risk-free.',
+        rating: 5,
+        comment:
+            'Copped the SB Dunk Low J-Pack Shadow and it arrived next day, exactly as pictured. COD made it risk-free.',
     },
     {
         name: 'Nusrat Jahan',
         city: 'Chittagong',
-        quote: 'Was skeptical about ordering sneakers online outside Dhaka but delivery only took 3 days and everything matched the listing.',
+        rating: 5,
+        comment:
+            'Was skeptical about ordering sneakers online outside Dhaka but delivery only took 3 days and everything matched the listing.',
     },
     {
         name: 'Tanvir Ahmed',
         city: 'Sylhet',
-        quote: 'Best sneaker plug in Bangladesh. Ordered the Air Jordan 1 Panda High, sizing was spot on thanks to their size guide.',
+        rating: 5,
+        comment:
+            'Best sneaker plug in Bangladesh. Ordered the Air Jordan 1 Panda High, sizing was spot on thanks to their size guide.',
     },
 ];
 
@@ -72,8 +87,11 @@ export default function Home({
     brands,
     banners,
     categories,
+    reviews,
 }: HomeProps) {
     const bestSellersRef = useRef<HTMLDivElement>(null);
+    const displayedReviews =
+        reviews.length > 0 ? reviews : FALLBACK_REVIEWS;
 
     useEffect(() => {
         const track = bestSellersRef.current;
@@ -232,34 +250,6 @@ export default function Home({
                 )}
             </section>
 
-            <section className="border-y border-store-gray bg-store-cream/40">
-                <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-                    <h2 className="mb-10 text-center text-2xl font-extrabold tracking-tight uppercase">
-                        Why Choose Vint-Edge
-                    </h2>
-                    <div className="grid gap-8 sm:grid-cols-3">
-                        {WHY_CHOOSE_US.map(
-                            ({ icon: Icon, title, description }) => (
-                                <div
-                                    key={title}
-                                    className="flex flex-col items-center gap-3 rounded-sm border border-store-gray bg-store-bone p-6 text-center shadow-sm"
-                                >
-                                    <span className="flex size-14 items-center justify-center rounded-full bg-store-alert/10">
-                                        <Icon className="size-6 text-store-alert" />
-                                    </span>
-                                    <h3 className="text-sm font-bold tracking-wide text-store-ink uppercase">
-                                        {title}
-                                    </h3>
-                                    <p className="text-sm text-muted-foreground">
-                                        {description}
-                                    </p>
-                                </div>
-                            ),
-                        )}
-                    </div>
-                </div>
-            </section>
-
             {featured.length > 0 && (
                 <section className="bg-store-gray/30">
                     <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
@@ -291,29 +281,70 @@ export default function Home({
                 </section>
             )}
 
-            <section className="mx-auto max-w-7xl border-t border-store-gray px-4 py-16 sm:px-6 lg:px-8">
-                <h2 className="mb-8 text-center text-2xl font-extrabold tracking-tight uppercase">
-                    What Bangladesh Is Saying
-                </h2>
+            <section className="border-y border-store-gray bg-store-cream/40">
+                <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+                    <h2 className="mb-10 text-center text-2xl font-extrabold tracking-tight uppercase">
+                        Why Choose Vint-Edge
+                    </h2>
+                    <div className="grid gap-8 sm:grid-cols-3">
+                        {WHY_CHOOSE_US.map(
+                            ({ icon: Icon, title, description }) => (
+                                <div
+                                    key={title}
+                                    className="flex flex-col items-center gap-3 rounded-sm border border-store-gray bg-store-bone p-6 text-center shadow-sm"
+                                >
+                                    <span className="flex size-14 items-center justify-center rounded-full bg-store-alert/10">
+                                        <Icon className="size-6 text-store-alert" />
+                                    </span>
+                                    <h3 className="text-sm font-bold tracking-wide text-store-ink uppercase">
+                                        {title}
+                                    </h3>
+                                    <p className="text-sm text-muted-foreground">
+                                        {description}
+                                    </p>
+                                </div>
+                            ),
+                        )}
+                    </div>
+                </div>
+            </section>
+
+            <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+                <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+                    <h2 className="text-2xl font-extrabold tracking-tight uppercase">
+                        What Bangladesh Is Saying
+                    </h2>
+                    <WriteReviewModal
+                        trigger={
+                            <Button
+                                variant="outline"
+                                className="rounded-sm border-store-ink text-store-ink hover:bg-store-ink/5"
+                            >
+                                Write a Review
+                            </Button>
+                        }
+                    />
+                </div>
                 <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4">
-                    {REVIEWS.map((review) => (
+                    {displayedReviews.map((review, index) => (
                         <div
-                            key={review.name}
+                            key={`${review.name}-${index}`}
                             className="w-72 shrink-0 snap-start rounded-sm border border-store-gray bg-store-cream/30 p-5 shadow-sm sm:w-96"
                         >
                             <div className="flex gap-0.5 text-store-alert">
-                                {Array.from({ length: 5 }).map((_, index) => (
+                                {Array.from({ length: 5 }).map((_, i) => (
                                     <Star
-                                        key={index}
-                                        className="size-3.5 fill-current"
+                                        key={i}
+                                        className={`size-3.5 ${i < review.rating ? 'fill-current' : ''}`}
                                     />
                                 ))}
                             </div>
                             <p className="mt-3 text-sm text-muted-foreground">
-                                &ldquo;{review.quote}&rdquo;
+                                &ldquo;{review.comment}&rdquo;
                             </p>
                             <p className="mt-3 text-xs font-semibold tracking-wide uppercase">
-                                {review.name} · {review.city}
+                                {review.name}
+                                {review.city ? ` · ${review.city}` : ''}
                             </p>
                         </div>
                     ))}

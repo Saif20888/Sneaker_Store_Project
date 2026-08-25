@@ -11,6 +11,7 @@ use App\Http\Controllers\Store\NewsletterController;
 use App\Http\Controllers\Store\OrderController;
 use App\Http\Controllers\Store\PageController;
 use App\Http\Controllers\Store\ProductController;
+use App\Http\Controllers\Store\ReviewController;
 use App\Http\Controllers\Store\SslCommerzController;
 use App\Http\Controllers\Store\StoreLocationController;
 use App\Http\Controllers\Store\TrackOrderController;
@@ -43,6 +44,7 @@ Route::middleware('throttle:storefront-write')->group(function () {
     Route::patch('cart/update', [CartController::class, 'update'])->name('cart.update');
     Route::delete('cart/remove', [CartController::class, 'destroy'])->name('cart.destroy');
     Route::post('checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+    Route::post('reviews', [ReviewController::class, 'store'])->name('reviews.store');
 });
 
 Route::middleware(['auth'])->group(function () {

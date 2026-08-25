@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\HomeBannerController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Middleware\EnsureUserIsAdmin;
 use Illuminate\Support\Facades\Route;
 
@@ -44,4 +45,8 @@ Route::prefix('admin')
         Route::post('banners', [HomeBannerController::class, 'store'])->name('banners.store');
         Route::patch('banners/reorder', [HomeBannerController::class, 'reorder'])->name('banners.reorder');
         Route::delete('banners/{banner}', [HomeBannerController::class, 'destroy'])->name('banners.destroy');
+
+        Route::get('reviews', [ReviewController::class, 'index'])->name('reviews.index');
+        Route::patch('reviews/{review}/approve', [ReviewController::class, 'approve'])->name('reviews.approve');
+        Route::delete('reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
     });
