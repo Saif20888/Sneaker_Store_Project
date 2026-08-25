@@ -29,7 +29,7 @@ export default function MobileAddToBagBar({
                 <Button
                     size="lg"
                     variant="outline"
-                    className="flex-1 rounded-sm border-store-ink text-store-ink hover:bg-store-ink/5"
+                    className="flex-1 rounded-sm border-store-ink bg-white text-store-ink hover:bg-store-ink/5 hover:text-store-ink"
                     disabled={disabled}
                     onClick={onAddToBag}
                 >

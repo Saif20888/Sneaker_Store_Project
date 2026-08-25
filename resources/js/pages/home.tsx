@@ -318,7 +318,7 @@ export default function Home({
                         trigger={
                             <Button
                                 variant="outline"
-                                className="rounded-sm border-store-ink text-store-ink hover:bg-store-ink/5"
+                                className="rounded-sm border-store-ink bg-white text-store-ink hover:bg-store-ink/5 hover:text-store-ink"
                             >
                                 Write a Review
                             </Button>

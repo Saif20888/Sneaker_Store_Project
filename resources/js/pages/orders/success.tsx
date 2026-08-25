@@ -153,7 +153,7 @@ export default function OrderShow({ order }: OrderProps) {
                         asChild
                         size="lg"
                         variant="outline"
-                        className="w-full rounded-sm border-store-ink text-store-ink hover:bg-store-ink/5"
+                        className="w-full rounded-sm border-store-ink bg-white text-store-ink hover:bg-store-ink/5 hover:text-store-ink"
                     >
                         <a href={invoice(order.order_number).url}>
                             <Download className="size-4" />
