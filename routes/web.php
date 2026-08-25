@@ -52,6 +52,7 @@ Route::middleware(['auth'])->group(function () {
 
 Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
 Route::get('orders/success/{order:order_number}', [OrderController::class, 'show'])->name('orders.success');
+Route::get('orders/{order:order_number}/invoice', [OrderController::class, 'invoice'])->name('orders.invoice');
 
 Route::match(['get', 'post'], 'payments/sslcommerz/success', [SslCommerzController::class, 'success'])->name('payments.sslcommerz.success');
 Route::match(['get', 'post'], 'payments/sslcommerz/fail', [SslCommerzController::class, 'fail'])->name('payments.sslcommerz.fail');

@@ -7,6 +7,7 @@ import {
     store as addToCart,
     update as updateCartItem,
 } from '@/routes/cart';
+import { index as checkoutIndex } from '@/routes/checkout';
 import type { CartShare } from '@/types/store';
 
 type CartUiContextValue = {
@@ -80,6 +81,21 @@ export function useCart() {
         );
     };
 
+    /**
+     * Add an item to the cart and go straight to checkout, skipping the cart
+     * drawer — for the "Buy Now" flow.
+     */
+    const buyNow = (variantId: number, quantity = 1) => {
+        router.post(
+            addToCart().url,
+            { variant_id: variantId, quantity },
+            {
+                preserveScroll: true,
+                onSuccess: () => router.visit(checkoutIndex().url),
+            },
+        );
+    };
+
     const updateQuantity = (variantId: number, quantity: number) => {
         router.patch(
             updateCartItem().url,
@@ -101,6 +117,7 @@ export function useCart() {
         count: cart?.count ?? 0,
         subtotal: cart?.subtotal ?? 0,
         addItem,
+        buyNow,
         updateQuantity,
         removeItem,
         ...ui,

@@ -19,6 +19,7 @@ use Illuminate\Support\Carbon;
  * @property string $slug
  * @property string|null $description
  * @property int $original_price
+ * @property int|null $purchase_price
  * @property int|null $discount_price
  * @property float|null $discount_percentage
  * @property array<int, string>|null $images
@@ -31,7 +32,7 @@ use Illuminate\Support\Carbon;
  * @property-read Brand $brand
  * @property-read Collection<int, ProductVariant> $variants
  */
-#[Fillable(['category_id', 'brand_id', 'name', 'slug', 'description', 'original_price', 'discount_price', 'discount_percentage', 'images', 'is_featured', 'is_trending', 'release_date'])]
+#[Fillable(['category_id', 'brand_id', 'name', 'slug', 'description', 'original_price', 'purchase_price', 'discount_price', 'discount_percentage', 'images', 'is_featured', 'is_trending', 'release_date'])]
 class Product extends Model
 {
     /** @use HasFactory<ProductFactory> */

@@ -18,7 +18,6 @@ type AdminProduct = {
     image: string | null;
     total_stock: number;
     is_featured: boolean;
-    is_trending: boolean;
 };
 
 type PaginationLink = {

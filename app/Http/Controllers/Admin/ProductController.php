@@ -47,7 +47,6 @@ class ProductController extends Controller
                 'image' => $product->images[0] ?? null,
                 'total_stock' => $product->variants->sum('stock_quantity'),
                 'is_featured' => $product->is_featured,
-                'is_trending' => $product->is_trending,
             ]);
 
         return Inertia::render('admin/products/index', [
@@ -108,10 +107,10 @@ class ProductController extends Controller
                 'brand_id' => $product->brand_id,
                 'description' => $product->description,
                 'original_price' => $product->original_price,
+                'purchase_price' => $product->purchase_price,
                 'discount_price' => $product->discount_price,
                 'discount_percentage' => $product->discount_percentage,
                 'is_featured' => $product->is_featured,
-                'is_trending' => $product->is_trending,
                 'release_date' => $product->release_date?->toDateString(),
                 'images' => $product->images ?? [],
                 'variants' => $product->variants->map(fn ($variant) => [

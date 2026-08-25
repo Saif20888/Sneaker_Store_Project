@@ -302,9 +302,9 @@ class OrderController extends Controller
      */
     public function sendToSteadfast(Request $request, Order $order, SteadfastService $steadfast): RedirectResponse
     {
-        if ($order->status === OrderStatus::Cancelled) {
+        if ($order->status === OrderStatus::Cancelled || $order->status === OrderStatus::Returned) {
             throw ValidationException::withMessages([
-                'steadfast' => 'Cancelled orders cannot be sent to the courier.',
+                'steadfast' => 'Cancelled or returned orders cannot be sent to the courier.',
             ]);
         }
 

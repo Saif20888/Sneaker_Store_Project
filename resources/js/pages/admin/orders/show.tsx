@@ -334,16 +334,17 @@ export default function AdminOrderShow({
                             >
                                 Done
                             </Button>
-                            {order.status !== 'cancelled' && (
-                                <Button
-                                    type="button"
-                                    variant="destructive"
-                                    disabled={statusForm.processing}
-                                    onClick={cancelOrder}
-                                >
-                                    Cancel Order
-                                </Button>
-                            )}
+                            {order.status !== 'cancelled' &&
+                                order.status !== 'returned' && (
+                                    <Button
+                                        type="button"
+                                        variant="destructive"
+                                        disabled={statusForm.processing}
+                                        onClick={cancelOrder}
+                                    >
+                                        Cancel Order
+                                    </Button>
+                                )}
                             {statusForm.errors.status && (
                                 <p className="w-full text-xs text-destructive">
                                     {statusForm.errors.status}
@@ -495,7 +496,7 @@ export default function AdminOrderShow({
                     </Card>
                 )}
 
-                {order.status !== 'cancelled' && (
+                {order.status !== 'cancelled' && order.status !== 'returned' && (
                     <Card>
                         <CardHeader>
                             <CardTitle>Courier (SteadFast)</CardTitle>

@@ -6,6 +6,7 @@ const STATUS_STYLES: Record<string, string> = {
     shipped: 'border-transparent bg-indigo-100 text-indigo-800',
     delivered: 'border-transparent bg-emerald-100 text-emerald-800',
     cancelled: 'border-transparent bg-red-100 text-red-800',
+    returned: 'border-transparent bg-orange-100 text-orange-800',
 };
 
 export default function OrderStatusBadge({

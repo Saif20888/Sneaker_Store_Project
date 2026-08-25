@@ -9,6 +9,7 @@ enum OrderStatus: string
     case Shipped = 'shipped';
     case Delivered = 'delivered';
     case Cancelled = 'cancelled';
+    case Returned = 'returned';
 
     /**
      * Get the display label for the status.
@@ -29,6 +30,19 @@ enum OrderStatus: string
             self::Shipped => 'Out for Delivery',
             self::Delivered => 'Delivered',
             self::Cancelled => 'Cancelled',
+            self::Returned => 'Returned',
+        };
+    }
+
+    /**
+     * Determine whether this status frees up the order's reserved stock — i.e. the goods
+     * are back in hand and available to sell again.
+     */
+    public function restocksInventory(): bool
+    {
+        return match ($this) {
+            self::Cancelled, self::Returned => true,
+            default => false,
         };
     }
 
@@ -43,7 +57,7 @@ enum OrderStatus: string
             self::Processing => 2,
             self::Shipped => 3,
             self::Delivered => 4,
-            self::Cancelled => null,
+            self::Cancelled, self::Returned => null,
         };
     }
 }

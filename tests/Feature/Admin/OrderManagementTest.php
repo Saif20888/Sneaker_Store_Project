@@ -1,5 +1,6 @@
 <?php
 
+use App\Actions\Admin\UpdateOrderStatus;
 use App\Enums\OrderStatus;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -96,8 +97,8 @@ test('two concurrent cancel calls on the same order do not double-restock', func
     $staleA = Order::find($order->id);
     $staleB = Order::find($order->id);
 
-    app(App\Actions\Admin\UpdateOrderStatus::class)->handle($staleA, OrderStatus::Cancelled);
-    app(App\Actions\Admin\UpdateOrderStatus::class)->handle($staleB, OrderStatus::Cancelled);
+    app(UpdateOrderStatus::class)->handle($staleA, OrderStatus::Cancelled);
+    app(UpdateOrderStatus::class)->handle($staleB, OrderStatus::Cancelled);
 
     expect($variant->fresh()->stock_quantity)->toBe(5);
 });
@@ -151,6 +152,49 @@ test('reopening a cancelled order fails when stock is no longer available', func
     $response->assertSessionHasErrors('status');
     expect($order->fresh()->status)->toBe(OrderStatus::Cancelled);
     expect($variant->fresh()->stock_quantity)->toBe(1);
+});
+
+test('marking an order returned restocks its variants', function () {
+    $variant = ProductVariant::factory()->create(['stock_quantity' => 3]);
+    $order = Order::factory()->create(['status' => OrderStatus::Delivered]);
+    OrderItem::factory()->create([
+        'order_id' => $order->id,
+        'product_variant_id' => $variant->id,
+        'quantity' => 2,
+    ]);
+
+    $response = $this->actingAs(adminUser())
+        ->patch(route('admin.orders.update-status', $order), ['status' => 'returned']);
+
+    $response->assertRedirect();
+    expect($order->fresh()->status)->toBe(OrderStatus::Returned);
+    expect($variant->fresh()->stock_quantity)->toBe(5);
+});
+
+test('reopening a returned order re-decrements stock when available', function () {
+    $variant = ProductVariant::factory()->create(['stock_quantity' => 5]);
+    $order = Order::factory()->create(['status' => OrderStatus::Returned]);
+    OrderItem::factory()->create([
+        'order_id' => $order->id,
+        'product_variant_id' => $variant->id,
+        'quantity' => 2,
+    ]);
+
+    $response = $this->actingAs(adminUser())
+        ->patch(route('admin.orders.update-status', $order), ['status' => 'processing']);
+
+    $response->assertRedirect();
+    expect($order->fresh()->status)->toBe(OrderStatus::Processing);
+    expect($variant->fresh()->stock_quantity)->toBe(3);
+});
+
+test('a returned order cannot be sent to the courier', function () {
+    $order = Order::factory()->create(['status' => OrderStatus::Returned]);
+
+    $response = $this->actingAs(adminUser())
+        ->post(route('admin.orders.steadfast.send', $order));
+
+    $response->assertSessionHasErrors('steadfast');
 });
 
 test('admin can change an order item to a different product variant and totals recompute', function () {

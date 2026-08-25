@@ -12,7 +12,7 @@ class UpdateOrderStatus
 {
     /**
      * Update an order's status, restocking or re-reserving variant stock when the
-     * status transitions into or out of Cancelled.
+     * status transitions into or out of a stock-restocking status (Cancelled, Returned).
      */
     public function handle(Order $order, OrderStatus $status): Order
     {
@@ -32,11 +32,11 @@ class UpdateOrderStatus
                 ->get()
                 ->keyBy('id');
 
-            if ($status === OrderStatus::Cancelled) {
+            if ($status->restocksInventory() && ! $order->status->restocksInventory()) {
                 foreach ($order->items as $item) {
                     $variants->get($item->product_variant_id)?->increment('stock_quantity', $item->quantity);
                 }
-            } elseif ($order->status === OrderStatus::Cancelled) {
+            } elseif (! $status->restocksInventory() && $order->status->restocksInventory()) {
                 foreach ($order->items as $item) {
                     $variant = $variants->get($item->product_variant_id);
 

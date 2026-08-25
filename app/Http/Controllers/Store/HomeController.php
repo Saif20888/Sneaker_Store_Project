@@ -17,10 +17,14 @@ class HomeController extends Controller
      */
     public function index(): Response
     {
+        // "Best Sellers" surfaces the highest-stock in-stock products first, so the
+        // storefront naturally pushes admins' deepest inventory to sell through.
         $bestSellers = Product::query()
             ->with(['brand', 'variants'])
-            ->where('is_trending', true)
-            ->latest('release_date')
+            ->withSum('variants', 'stock_quantity')
+            ->groupBy('products.id')
+            ->having('variants_sum_stock_quantity', '>', 0)
+            ->orderByDesc('variants_sum_stock_quantity')
             ->take(8)
             ->get()
             ->map(fn (Product $product) => $product->toCard());

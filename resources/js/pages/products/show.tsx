@@ -83,7 +83,7 @@ const ACCORDIONS = (description: string | null) => [
 ];
 
 export default function ProductShow({ product, related }: ProductProps) {
-    const { addItem, openCart } = useCart();
+    const { addItem, buyNow, openCart } = useCart();
     const [selectedSize, setSelectedSize] = useState<string | null>(null);
     const [activeImage, setActiveImage] = useState(0);
     const [quantity, setQuantity] = useState(1);
@@ -108,6 +108,14 @@ export default function ProductShow({ product, related }: ProductProps) {
 
         addItem(selectedVariant.id, quantity);
         openCart();
+    };
+
+    const handleBuyNow = () => {
+        if (!selectedVariant || selectedVariant.stock_quantity <= 0) {
+            return;
+        }
+
+        buyNow(selectedVariant.id, quantity);
     };
 
     const whatsappHref = (() => {
@@ -294,6 +302,18 @@ export default function ProductShow({ product, related }: ProductProps) {
                                     : 'Select a Size'}
                             </Button>
                             <Button
+                                size="lg"
+                                variant="outline"
+                                className="hidden rounded-sm border-store-ink bg-white text-store-ink hover:bg-store-ink/5 hover:text-store-ink lg:inline-flex"
+                                disabled={
+                                    !selectedVariant ||
+                                    selectedVariant.stock_quantity <= 0
+                                }
+                                onClick={handleBuyNow}
+                            >
+                                {selectedVariant ? 'Buy Now' : 'Select a Size'}
+                            </Button>
+                            <Button
                                 asChild
                                 size="lg"
                                 variant="outline"
@@ -381,6 +401,7 @@ export default function ProductShow({ product, related }: ProductProps) {
                     !selectedVariant || selectedVariant.stock_quantity <= 0
                 }
                 onAddToBag={handleAddToBag}
+                onBuyNow={handleBuyNow}
             />
         </>
     );

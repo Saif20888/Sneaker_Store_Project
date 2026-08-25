@@ -1,8 +1,9 @@
 import { Head, Link } from '@inertiajs/react';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatBdt } from '@/lib/currency';
 import { home } from '@/routes';
+import { invoice } from '@/routes/orders';
 
 type OrderProps = {
     order: {
@@ -147,13 +148,26 @@ export default function OrderShow({ order }: OrderProps) {
                     </div>
                 </dl>
 
-                <Button
-                    asChild
-                    size="lg"
-                    className="mt-8 w-full rounded-sm bg-store-ink text-store-bone hover:bg-store-ink/90"
-                >
-                    <Link href={home()}>Continue Shopping</Link>
-                </Button>
+                <div className="mt-8 flex flex-col gap-2">
+                    <Button
+                        asChild
+                        size="lg"
+                        variant="outline"
+                        className="w-full rounded-sm border-store-ink text-store-ink hover:bg-store-ink/5"
+                    >
+                        <a href={invoice(order.order_number).url}>
+                            <Download className="size-4" />
+                            Download Invoice (PDF)
+                        </a>
+                    </Button>
+                    <Button
+                        asChild
+                        size="lg"
+                        className="w-full rounded-sm bg-store-ink text-store-bone hover:bg-store-ink/90"
+                    >
+                        <Link href={home()}>Continue Shopping</Link>
+                    </Button>
+                </div>
             </div>
         </>
     );

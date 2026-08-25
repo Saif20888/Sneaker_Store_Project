@@ -22,10 +22,10 @@ type ProductFormValues = {
     brand_id: string;
     description: string;
     original_price: string;
+    purchase_price: string;
     discount_price: string;
     discount_percentage: string;
     is_featured: boolean;
-    is_trending: boolean;
     release_date: string;
     images: File[];
     existing_images: string[];
@@ -85,10 +85,10 @@ export default function ProductForm({
             brand_id: '',
             description: '',
             original_price: '',
+            purchase_price: '',
             discount_price: '',
             discount_percentage: '',
             is_featured: false,
-            is_trending: false,
             release_date: '',
             images: [],
             existing_images: initialExistingImages,
@@ -288,22 +288,58 @@ export default function ProductForm({
                 )}
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <div className="grid gap-2">
-                    <Label htmlFor="original_price">Original Price (BDT)</Label>
+                    <Label htmlFor="original_price">Selling Price (BDT)</Label>
                     <Input
                         id="original_price"
                         type="number"
                         min={0}
                         value={data.original_price}
-                        onChange={(e) =>
-                            setData('original_price', e.target.value)
-                        }
+                        onChange={(e) => {
+                            const nextOriginal = e.target.value;
+                            setData('original_price', nextOriginal);
+
+                            // Keep the discount price in sync with the selling price
+                            // whenever a discount percentage is already set.
+                            const pct = Number(data.discount_percentage);
+                            const original = Number(nextOriginal);
+
+                            if (data.discount_percentage !== '' && original > 0) {
+                                setData(
+                                    'discount_price',
+                                    String(
+                                        Math.round(
+                                            original * (1 - pct / 100),
+                                        ),
+                                    ),
+                                );
+                            }
+                        }}
                         required
                     />
                     {errors.original_price && (
                         <p className="text-xs text-destructive">
                             {errors.original_price}
+                        </p>
+                    )}
+                </div>
+
+                <div className="grid gap-2">
+                    <Label htmlFor="purchase_price">Purchase Price (BDT)</Label>
+                    <Input
+                        id="purchase_price"
+                        type="number"
+                        min={0}
+                        placeholder="What this cost you"
+                        value={data.purchase_price}
+                        onChange={(e) =>
+                            setData('purchase_price', e.target.value)
+                        }
+                    />
+                    {errors.purchase_price && (
+                        <p className="text-xs text-destructive">
+                            {errors.purchase_price}
                         </p>
                     )}
                 </div>
@@ -315,9 +351,28 @@ export default function ProductForm({
                         type="number"
                         min={0}
                         value={data.discount_price}
-                        onChange={(e) =>
-                            setData('discount_price', e.target.value)
-                        }
+                        onChange={(e) => {
+                            const nextDiscountPrice = e.target.value;
+                            setData('discount_price', nextDiscountPrice);
+
+                            const original = Number(data.original_price);
+                            const discountPrice = Number(nextDiscountPrice);
+
+                            if (nextDiscountPrice !== '' && original > 0) {
+                                setData(
+                                    'discount_percentage',
+                                    String(
+                                        Math.round(
+                                            ((original - discountPrice) /
+                                                original) *
+                                                10000,
+                                        ) / 100,
+                                    ),
+                                );
+                            } else if (nextDiscountPrice === '') {
+                                setData('discount_percentage', '');
+                            }
+                        }}
                     />
                     {errors.discount_price && (
                         <p className="text-xs text-destructive">
@@ -334,9 +389,26 @@ export default function ProductForm({
                         min={0}
                         max={100}
                         value={data.discount_percentage}
-                        onChange={(e) =>
-                            setData('discount_percentage', e.target.value)
-                        }
+                        onChange={(e) => {
+                            const nextPct = e.target.value;
+                            setData('discount_percentage', nextPct);
+
+                            const original = Number(data.original_price);
+                            const pct = Number(nextPct);
+
+                            if (nextPct !== '' && original > 0) {
+                                setData(
+                                    'discount_price',
+                                    String(
+                                        Math.round(
+                                            original * (1 - pct / 100),
+                                        ),
+                                    ),
+                                );
+                            } else if (nextPct === '') {
+                                setData('discount_price', '');
+                            }
+                        }}
                     />
                     {errors.discount_percentage && (
                         <p className="text-xs text-destructive">
@@ -346,7 +418,7 @@ export default function ProductForm({
                 </div>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-2">
                 <div className="grid gap-2">
                     <Label htmlFor="release_date">Release Date</Label>
                     <Input
@@ -367,16 +439,6 @@ export default function ProductForm({
                         }
                     />
                     Featured
-                </label>
-
-                <label className="flex items-center gap-2 self-end pb-2 text-sm">
-                    <Checkbox
-                        checked={data.is_trending}
-                        onCheckedChange={(checked) =>
-                            setData('is_trending', checked === true)
-                        }
-                    />
-                    Best Seller
                 </label>
             </div>
 

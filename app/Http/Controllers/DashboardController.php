@@ -43,7 +43,7 @@ class DashboardController extends Controller
                 'processing_orders' => Order::query()->where('status', OrderStatus::Processing)->count(),
                 'orders_today' => Order::query()->whereDate('created_at', Carbon::today())->count(),
                 'revenue_30d' => (int) Order::query()
-                    ->where('status', '!=', OrderStatus::Cancelled)
+                    ->whereNotIn('status', [OrderStatus::Cancelled, OrderStatus::Returned])
                     ->where('created_at', '>=', Carbon::now()->subDays(30))
                     ->sum('total_amount'),
                 'total_products' => Product::query()->count(),

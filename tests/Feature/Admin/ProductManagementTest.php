@@ -76,10 +76,10 @@ test('admin can create a product with variants and images', function () {
         'brand_id' => $brand->id,
         'description' => 'A test sneaker.',
         'original_price' => 5000,
+        'purchase_price' => 3200,
         'discount_price' => 4000,
         'discount_percentage' => 20,
         'is_featured' => true,
-        'is_trending' => false,
         'images' => [UploadedFile::fake()->image('shoe.jpg')],
         'variants' => [
             ['size' => '42', 'stock_quantity' => 10],
@@ -92,6 +92,7 @@ test('admin can create a product with variants and images', function () {
     $product = Product::where('slug', 'air-test-1')->firstOrFail();
 
     expect($product->name)->toBe('Air Test 1');
+    expect($product->purchase_price)->toBe(3200);
     expect($product->variants)->toHaveCount(2);
     expect($product->images)->toHaveCount(1);
 
@@ -243,6 +244,24 @@ test('admin can update a product and its variants', function () {
     expect($product->fresh()->name)->toBe('New Name');
     expect($variant->fresh()->stock_quantity)->toBe(20);
     expect($product->fresh()->variants)->toHaveCount(2);
+});
+
+test('admin can set a purchase price on update', function () {
+    $product = Product::factory()->create(['purchase_price' => null]);
+    $variant = ProductVariant::factory()->create(['product_id' => $product->id]);
+
+    $this->actingAs(adminUser())->patch(route('admin.products.update', $product), [
+        'name' => $product->name,
+        'slug' => $product->slug,
+        'category_id' => $product->category_id,
+        'brand_id' => $product->brand_id,
+        'original_price' => $product->original_price,
+        'purchase_price' => 2500,
+        'existing_images' => [],
+        'variants' => [['id' => $variant->id, 'size' => $variant->size, 'stock_quantity' => $variant->stock_quantity]],
+    ]);
+
+    expect($product->fresh()->purchase_price)->toBe(2500);
 });
 
 test('admin can delete a product with no orders', function () {

@@ -47,7 +47,53 @@ test('business report aggregates revenue, status counts, and top sellers', funct
         ->component('admin/reports/index')
         ->where('kpis.total_orders', 2)
         ->has('trend', 30)
-        ->has('statusBreakdown', 5)
+        ->has('statusBreakdown', 6)
         ->where('topProducts.0.product_name', 'Report Runner')
         ->where('topBrands.0.brand', 'Vint-Edge Originals'));
+});
+
+test('business report computes profit from purchase price, selling price, and courier cost', function () {
+    $product = Product::factory()->create(['original_price' => 5000, 'purchase_price' => 3000]);
+    $variant = ProductVariant::factory()->create(['product_id' => $product->id]);
+
+    $order = Order::factory()->create([
+        'status' => OrderStatus::Delivered,
+        'delivery_fee' => 100,
+        'actual_delivery_cost' => 120,
+    ]);
+    OrderItem::factory()->create([
+        'order_id' => $order->id,
+        'product_variant_id' => $variant->id,
+        'unit_price' => 5000,
+        'quantity' => 2,
+    ]);
+
+    // No purchase price recorded — should not contribute to profit, and shouldn't error.
+    $noCostProduct = Product::factory()->create(['purchase_price' => null]);
+    $noCostVariant = ProductVariant::factory()->create(['product_id' => $noCostProduct->id]);
+    $noCostOrder = Order::factory()->create([
+        'status' => OrderStatus::Delivered,
+        'actual_delivery_cost' => 50,
+    ]);
+    OrderItem::factory()->create([
+        'order_id' => $noCostOrder->id,
+        'product_variant_id' => $noCostVariant->id,
+        'unit_price' => 4000,
+        'quantity' => 1,
+    ]);
+
+    // Delivery cost not recorded yet — should not contribute to profit.
+    $pendingOrder = Order::factory()->create(['status' => OrderStatus::Delivered, 'actual_delivery_cost' => null]);
+    OrderItem::factory()->create([
+        'order_id' => $pendingOrder->id,
+        'product_variant_id' => $variant->id,
+        'unit_price' => 5000,
+        'quantity' => 1,
+    ]);
+
+    $response = $this->actingAs(adminUser())->get(route('admin.reports.index'));
+
+    // ((5000 - 3000) * 2) - 120 = 3880. The no-purchase-price and no-delivery-cost
+    // orders contribute nothing rather than being treated as zero-margin.
+    $response->assertInertia(fn (Assert $page) => $page->where('kpis.total_profit', 3880));
 });

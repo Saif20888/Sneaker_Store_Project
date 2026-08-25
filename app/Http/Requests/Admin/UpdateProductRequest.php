@@ -15,7 +15,6 @@ class UpdateProductRequest extends FormRequest
     {
         $this->merge([
             'is_featured' => $this->boolean('is_featured'),
-            'is_trending' => $this->boolean('is_trending'),
         ]);
     }
 
@@ -33,10 +32,10 @@ class UpdateProductRequest extends FormRequest
             'brand_id' => ['required', 'integer', 'exists:brands,id'],
             'description' => ['nullable', 'string'],
             'original_price' => ['required', 'integer', 'min:0'],
+            'purchase_price' => ['nullable', 'integer', 'min:0'],
             'discount_price' => ['nullable', 'integer', 'min:0', 'lt:original_price'],
             'discount_percentage' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'is_featured' => ['boolean'],
-            'is_trending' => ['boolean'],
             'release_date' => ['nullable', 'date'],
             'images' => ['nullable', 'array'],
             'images.*' => ['image', 'max:4096'],

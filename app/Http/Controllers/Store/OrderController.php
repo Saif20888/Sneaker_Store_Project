@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Store;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response as HttpResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -48,10 +50,7 @@ class OrderController extends Controller
      */
     public function show(Request $request, Order $order): Response
     {
-        $ownedByUser = $request->user() && $order->user_id === $request->user()->id;
-        $ownedByGuestCookie = $order->guest_id && $order->guest_id === $request->cookie('guest_id');
-
-        abort_unless($ownedByUser || $ownedByGuestCookie, 404);
+        $this->authorizeOwnership($request, $order);
 
         $order->load('items');
 
@@ -80,5 +79,32 @@ class OrderController extends Controller
                 ]),
             ],
         ]);
+    }
+
+    /**
+     * Generate and download a PDF invoice for the given order. Restricted to the
+     * order's owner, same as the confirmation page.
+     */
+    public function invoice(Request $request, Order $order): HttpResponse
+    {
+        $this->authorizeOwnership($request, $order);
+
+        $order->load('items');
+
+        $pdf = Pdf::loadView('orders.invoice', ['order' => $order]);
+
+        return $pdf->download("invoice-{$order->order_number}.pdf");
+    }
+
+    /**
+     * Ensure the requesting visitor owns this order — either a signed-in account
+     * match or a matching guest_id cookie stamped at checkout.
+     */
+    private function authorizeOwnership(Request $request, Order $order): void
+    {
+        $ownedByUser = $request->user() && $order->user_id === $request->user()->id;
+        $ownedByGuestCookie = $order->guest_id && $order->guest_id === $request->cookie('guest_id');
+
+        abort_unless($ownedByUser || $ownedByGuestCookie, 404);
     }
 }

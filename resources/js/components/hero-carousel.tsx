@@ -1,3 +1,4 @@
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 const DEFAULT_SLIDES = [
@@ -23,8 +24,19 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
         return () => clearInterval(interval);
     }, [activeSlides.length]);
 
+    const goToPrevious = () => {
+        setActive(
+            (current) =>
+                (current - 1 + activeSlides.length) % activeSlides.length,
+        );
+    };
+
+    const goToNext = () => {
+        setActive((current) => (current + 1) % activeSlides.length);
+    };
+
     return (
-        <div className="relative aspect-[4/3] w-full overflow-hidden bg-store-ink sm:aspect-[16/9]">
+        <div className="group relative aspect-[4/3] w-full overflow-hidden bg-store-ink sm:aspect-[16/9]">
             {activeSlides.map((src, index) => (
                 <img
                     key={src}
@@ -38,6 +50,27 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
                     }`}
                 />
             ))}
+
+            {activeSlides.length > 1 && (
+                <>
+                    <button
+                        type="button"
+                        onClick={goToPrevious}
+                        aria-label="Previous slide"
+                        className="absolute top-1/2 left-2 flex size-9 -translate-y-1/2 items-center justify-center rounded-full bg-store-ink/50 text-store-bone opacity-0 transition-opacity duration-200 group-hover:opacity-100 hover:bg-store-ink/70 sm:left-4"
+                    >
+                        <ChevronLeft className="size-5" />
+                    </button>
+                    <button
+                        type="button"
+                        onClick={goToNext}
+                        aria-label="Next slide"
+                        className="absolute top-1/2 right-2 flex size-9 -translate-y-1/2 items-center justify-center rounded-full bg-store-ink/50 text-store-bone opacity-0 transition-opacity duration-200 group-hover:opacity-100 hover:bg-store-ink/70 sm:right-4"
+                    >
+                        <ChevronRight className="size-5" />
+                    </button>
+                </>
+            )}
 
             <div className="absolute inset-x-0 bottom-4 flex justify-center gap-2 sm:bottom-6">
                 {activeSlides.map((src, index) => (

@@ -10,10 +10,10 @@ type EditableProduct = {
     brand_id: number;
     description: string | null;
     original_price: number;
+    purchase_price: number | null;
     discount_price: number | null;
     discount_percentage: number | null;
     is_featured: boolean;
-    is_trending: boolean;
     release_date: string | null;
     images: string[];
     variants: { id: number; size: string; stock_quantity: number }[];
@@ -55,6 +55,9 @@ export default function AdminProductsEdit({
                         brand_id: String(product.brand_id),
                         description: product.description ?? '',
                         original_price: String(product.original_price),
+                        purchase_price: product.purchase_price
+                            ? String(product.purchase_price)
+                            : '',
                         discount_price: product.discount_price
                             ? String(product.discount_price)
                             : '',
@@ -62,7 +65,6 @@ export default function AdminProductsEdit({
                             ? String(product.discount_percentage)
                             : '',
                         is_featured: product.is_featured,
-                        is_trending: product.is_trending,
                         release_date: product.release_date ?? '',
                         existing_images: product.images,
                         variants:

@@ -7,6 +7,7 @@ type Kpis = {
     total_orders: number;
     average_order_value: number;
     cancellation_rate: number;
+    total_profit: number;
 };
 
 type TrendPoint = { date: string; orders: number; revenue: number };
@@ -28,6 +29,7 @@ const STATUS_COLORS: Record<string, string> = {
     shipped: 'bg-indigo-500',
     delivered: 'bg-emerald-500',
     cancelled: 'bg-red-500',
+    returned: 'bg-orange-500',
 };
 
 export default function AdminReportsIndex({
@@ -93,6 +95,22 @@ export default function AdminReportsIndex({
                             </p>
                             <p className="mt-1 text-2xl font-bold">
                                 {kpis.cancellation_rate}%
+                            </p>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardContent>
+                            <p className="text-xs font-medium text-muted-foreground uppercase">
+                                Profit
+                            </p>
+                            <p
+                                className={`mt-1 text-2xl font-bold ${kpis.total_profit < 0 ? 'text-destructive' : ''}`}
+                            >
+                                {formatBdt(kpis.total_profit)}
+                            </p>
+                            <p className="mt-0.5 text-[11px] text-muted-foreground">
+                                Purchase price minus selling price and courier
+                                cost, orders with recorded costs only
                             </p>
                         </CardContent>
                     </Card>
