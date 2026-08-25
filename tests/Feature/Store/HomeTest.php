@@ -2,6 +2,7 @@
 
 use App\Models\Brand;
 use App\Models\Category;
+use App\Models\HomeBanner;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -53,6 +54,20 @@ test('home page best sellers are ordered by total stock and exclude out-of-stock
         ->has('bestSellers', 2)
         ->where('bestSellers.0.slug', $highStock->slug)
         ->where('bestSellers.1.slug', $lowStock->slug));
+});
+
+test('home page banners expose their click-through link', function () {
+    HomeBanner::factory()->create(['image' => '/storage/banners/a.jpg', 'link' => '/shop', 'position' => 0]);
+    HomeBanner::factory()->create(['image' => '/storage/banners/b.jpg', 'link' => null, 'position' => 1]);
+
+    $response = $this->get(route('home'));
+
+    $response->assertInertia(fn (Assert $page) => $page
+        ->component('home')
+        ->has('banners', 2)
+        ->where('banners.0.image', '/storage/banners/a.jpg')
+        ->where('banners.0.link', '/shop')
+        ->where('banners.1.link', null));
 });
 
 test('home page only lists categories that have an image', function () {

@@ -11,11 +11,12 @@ use Illuminate\Support\Carbon;
 /**
  * @property int $id
  * @property string $image
+ * @property string|null $link
  * @property int $position
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['image', 'position'])]
+#[Fillable(['image', 'link', 'position'])]
 class HomeBanner extends Model
 {
     /** @use HasFactory<HomeBannerFactory> */

@@ -1,20 +1,23 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-const DEFAULT_SLIDES = [
-    '/images/banners/banner-1.webp',
-    '/images/banners/banner-4.webp',
-    '/images/banners/banner-2.webp',
-    '/images/banners/banner-3.webp',
+export type HeroSlide = { image: string; link: string | null };
+
+const DEFAULT_SLIDES: HeroSlide[] = [
+    { image: '/images/banners/banner-1.webp', link: null },
+    { image: '/images/banners/banner-4.webp', link: null },
+    { image: '/images/banners/banner-2.webp', link: null },
+    { image: '/images/banners/banner-3.webp', link: null },
 ];
 
 type HeroCarouselProps = {
-    slides?: string[];
+    slides?: HeroSlide[];
 };
 
 export default function HeroCarousel({ slides }: HeroCarouselProps) {
     const [active, setActive] = useState(0);
     const activeSlides = slides && slides.length > 0 ? slides : DEFAULT_SLIDES;
+    const activeLink = activeSlides[active]?.link;
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -37,10 +40,10 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
 
     return (
         <div className="group relative aspect-[4/3] w-full overflow-hidden bg-store-ink sm:aspect-[16/9]">
-            {activeSlides.map((src, index) => (
+            {activeSlides.map((slide, index) => (
                 <img
-                    key={src}
-                    src={src}
+                    key={slide.image}
+                    src={slide.image}
                     alt=""
                     loading={index === 0 ? 'eager' : 'lazy'}
                     fetchPriority={index === 0 ? 'high' : 'auto'}
@@ -50,6 +53,14 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
                     }`}
                 />
             ))}
+
+            {activeLink && (
+                <a
+                    href={activeLink}
+                    aria-label="View this offer"
+                    className="absolute inset-0"
+                />
+            )}
 
             {activeSlides.length > 1 && (
                 <>
@@ -73,9 +84,9 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
             )}
 
             <div className="absolute inset-x-0 bottom-4 flex justify-center gap-2 sm:bottom-6">
-                {activeSlides.map((src, index) => (
+                {activeSlides.map((slide, index) => (
                     <button
-                        key={src}
+                        key={slide.image}
                         type="button"
                         onClick={() => setActive(index)}
                         aria-label={`Go to slide ${index + 1}`}

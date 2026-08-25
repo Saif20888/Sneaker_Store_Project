@@ -44,6 +44,7 @@ Route::prefix('admin')
         Route::get('banners', [HomeBannerController::class, 'index'])->name('banners.index');
         Route::post('banners', [HomeBannerController::class, 'store'])->name('banners.store');
         Route::patch('banners/reorder', [HomeBannerController::class, 'reorder'])->name('banners.reorder');
+        Route::patch('banners/{banner}', [HomeBannerController::class, 'update'])->name('banners.update');
         Route::delete('banners/{banner}', [HomeBannerController::class, 'destroy'])->name('banners.destroy');
 
         Route::get('reviews', [ReviewController::class, 'index'])->name('reviews.index');

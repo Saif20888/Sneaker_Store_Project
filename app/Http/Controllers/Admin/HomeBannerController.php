@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreHomeBannerRequest;
+use App\Http\Requests\Admin\UpdateHomeBannerRequest;
 use App\Models\HomeBanner;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -27,6 +28,7 @@ class HomeBannerController extends Controller
                 ->map(fn (HomeBanner $banner) => [
                     'id' => $banner->id,
                     'image' => $banner->image,
+                    'link' => $banner->link,
                 ]),
         ]);
     }
@@ -73,6 +75,16 @@ class HomeBannerController extends Controller
         }
 
         return back()->with('status', 'Banner order updated.');
+    }
+
+    /**
+     * Set (or clear) the click-through link for the given homepage banner.
+     */
+    public function update(UpdateHomeBannerRequest $request, HomeBanner $banner): RedirectResponse
+    {
+        $banner->update($request->validated());
+
+        return back()->with('status', 'Banner link updated.');
     }
 
     /**

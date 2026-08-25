@@ -2,6 +2,7 @@ import { Head, Link } from '@inertiajs/react';
 import { BadgeCheck, Star, Truck, Wallet } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import HeroCarousel from '@/components/hero-carousel';
+import type { HeroSlide } from '@/components/hero-carousel';
 import ProductCard from '@/components/product-card';
 import type { ProductCardData } from '@/components/product-card';
 import { Button } from '@/components/ui/button';
@@ -21,7 +22,7 @@ type HomeProps = {
     featured: ProductCardData[];
     latest: ProductCardData[];
     brands: { id: number; name: string; slug: string }[];
-    banners: string[];
+    banners: HeroSlide[];
     categories: HomeCategory[];
     reviews: HomeReview[];
 };

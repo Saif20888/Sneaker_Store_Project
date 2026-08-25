@@ -19,6 +19,7 @@ class HomeBannerFactory extends Factory
     {
         return [
             'image' => '/storage/banners/'.$this->faker->uuid().'.jpg',
+            'link' => null,
             'position' => 0,
         ];
     }

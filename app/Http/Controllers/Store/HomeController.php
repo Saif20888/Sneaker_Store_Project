@@ -54,7 +54,13 @@ class HomeController extends Controller
             'featured' => $featured,
             'latest' => $latest,
             'brands' => $brands,
-            'banners' => HomeBanner::query()->orderBy('position')->pluck('image'),
+            'banners' => HomeBanner::query()
+                ->orderBy('position')
+                ->get(['image', 'link'])
+                ->map(fn (HomeBanner $banner) => [
+                    'image' => $banner->image,
+                    'link' => $banner->link,
+                ]),
             'categories' => Category::query()
                 ->whereNotNull('image')
                 ->orderBy('name')
