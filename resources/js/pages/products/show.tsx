@@ -2,7 +2,6 @@ import { Head } from '@inertiajs/react';
 import { MessageCircle, Minus, Plus } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import ImageMagnifier from '@/components/image-magnifier';
-import MobileAddToBagBar from '@/components/mobile-add-to-bag-bar';
 import PriceTag from '@/components/price-tag';
 import ProductCard from '@/components/product-card';
 import type { ProductCardData } from '@/components/product-card';
@@ -141,7 +140,7 @@ export default function ProductShow({ product, related }: ProductProps) {
         <>
             <Head title={product.name} />
 
-            <div className="mx-auto max-w-7xl px-4 pb-24 sm:px-6 lg:px-8 lg:pb-0">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="grid gap-10 py-10 lg:grid-cols-2 lg:gap-16 lg:py-16">
                     {/* Gallery */}
                     <div className="flex flex-col gap-3">
@@ -305,7 +304,7 @@ export default function ProductShow({ product, related }: ProductProps) {
                             )}
 
                         <div className="flex flex-col gap-2">
-                            <div className="hidden grid-cols-2 gap-2 lg:grid">
+                            <div className="grid grid-cols-2 gap-2">
                                 <Button
                                     size="lg"
                                     className="rounded-sm bg-store-ink text-store-bone hover:bg-store-ink/90"
@@ -409,16 +408,6 @@ export default function ProductShow({ product, related }: ProductProps) {
                     </section>
                 )}
             </div>
-
-            <MobileAddToBagBar
-                originalPrice={product.original_price}
-                discountPrice={product.discount_price}
-                disabled={
-                    !!selectedVariant && selectedVariant.stock_quantity <= 0
-                }
-                onAddToBag={handleAddToBag}
-                onBuyNow={handleBuyNow}
-            />
         </>
     );
 }
