@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Enums\DiscountType;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreProductRequest extends FormRequest
 {
@@ -14,6 +16,7 @@ class StoreProductRequest extends FormRequest
     {
         $this->merge([
             'is_featured' => $this->boolean('is_featured'),
+            'discount_type' => $this->input('discount_type', DiscountType::Percentage->value),
         ]);
     }
 
@@ -34,6 +37,7 @@ class StoreProductRequest extends FormRequest
             'purchase_price' => ['nullable', 'integer', 'min:0'],
             'discount_price' => ['nullable', 'integer', 'min:0', 'lt:original_price'],
             'discount_percentage' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'discount_type' => ['required', Rule::enum(DiscountType::class)],
             'is_featured' => ['boolean'],
             'release_date' => ['nullable', 'date'],
             'images' => ['nullable', 'array'],

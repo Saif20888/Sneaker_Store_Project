@@ -4,6 +4,7 @@ import { useState } from 'react';
 import PriceTag from '@/components/price-tag';
 import ProductQuickViewModal from '@/components/product-quick-view-modal';
 import { useWishlist } from '@/hooks/use-wishlist';
+import { formatBdt } from '@/lib/currency';
 import { show } from '@/routes/products';
 
 export type ProductCardData = {
@@ -14,6 +15,7 @@ export type ProductCardData = {
     original_price: number;
     discount_price: number | null;
     discount_percentage: number | null;
+    discount_type?: 'percentage' | 'flat';
     images: string[] | null;
     is_in_stock?: boolean;
     is_limited?: boolean;
@@ -64,7 +66,9 @@ export default function ProductCard({ product }: { product: ProductCardData }) {
                     </span>
                 ) : isDiscounted ? (
                     <span className="absolute top-2 left-2 rounded-sm bg-store-alert px-2 py-1 text-[10px] font-bold tracking-wide text-white uppercase shadow-sm">
-                        {Math.round(product.discount_percentage ?? 0)}% Off
+                        {product.discount_type === 'flat'
+                            ? `${formatBdt(product.original_price - (product.discount_price ?? 0))} Off`
+                            : `${Math.round(product.discount_percentage ?? 0)}% Off`}
                     </span>
                 ) : (
                     product.is_limited && (

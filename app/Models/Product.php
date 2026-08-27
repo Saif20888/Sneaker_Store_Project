@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\DiscountType;
 use Database\Factories\ProductFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Collection;
@@ -22,6 +23,7 @@ use Illuminate\Support\Carbon;
  * @property int|null $purchase_price
  * @property int|null $discount_price
  * @property float|null $discount_percentage
+ * @property DiscountType $discount_type
  * @property array<int, string>|null $images
  * @property array<int, array{size: string, us: string, uk: string, cm: string}>|null $size_chart
  * @property bool $is_featured
@@ -33,7 +35,7 @@ use Illuminate\Support\Carbon;
  * @property-read Brand $brand
  * @property-read Collection<int, ProductVariant> $variants
  */
-#[Fillable(['category_id', 'brand_id', 'name', 'slug', 'description', 'original_price', 'purchase_price', 'discount_price', 'discount_percentage', 'images', 'size_chart', 'is_featured', 'is_trending', 'release_date'])]
+#[Fillable(['category_id', 'brand_id', 'name', 'slug', 'description', 'original_price', 'purchase_price', 'discount_price', 'discount_percentage', 'discount_type', 'images', 'size_chart', 'is_featured', 'is_trending', 'release_date'])]
 class Product extends Model
 {
     /** @use HasFactory<ProductFactory> */
@@ -96,7 +98,7 @@ class Product extends Model
     /**
      * Present this product as a card-friendly array shape.
      *
-     * @return array{id: int, slug: string, name: string, brand: string, original_price: int, discount_price: int|null, discount_percentage: float|null, images: array<int, string>|null, is_in_stock: bool}
+     * @return array{id: int, slug: string, name: string, brand: string, original_price: int, discount_price: int|null, discount_percentage: float|null, discount_type: string, images: array<int, string>|null, is_in_stock: bool}
      */
     public function toCard(): array
     {
@@ -108,6 +110,7 @@ class Product extends Model
             'original_price' => $this->original_price,
             'discount_price' => $this->isDiscounted() ? $this->discount_price : null,
             'discount_percentage' => $this->isDiscounted() ? $this->discount_percentage : null,
+            'discount_type' => $this->discount_type->value,
             'images' => $this->images,
             'is_in_stock' => $this->isInStock(),
         ];
@@ -127,6 +130,7 @@ class Product extends Model
             'is_trending' => 'boolean',
             'release_date' => 'date',
             'discount_percentage' => 'float',
+            'discount_type' => DiscountType::class,
         ];
     }
 

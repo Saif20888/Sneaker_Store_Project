@@ -110,6 +110,7 @@ class ProductController extends Controller
                 'purchase_price' => $product->purchase_price,
                 'discount_price' => $product->discount_price,
                 'discount_percentage' => $product->discount_percentage,
+                'discount_type' => $product->discount_type->value,
                 'is_featured' => $product->is_featured,
                 'release_date' => $product->release_date?->toDateString(),
                 'images' => $product->images ?? [],

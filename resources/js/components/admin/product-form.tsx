@@ -17,6 +17,8 @@ type VariantRow = {
     stock_quantity: number;
 };
 
+type DiscountType = 'percentage' | 'flat';
+
 type ProductFormValues = {
     name: string;
     slug: string;
@@ -27,6 +29,7 @@ type ProductFormValues = {
     purchase_price: string;
     discount_price: string;
     discount_percentage: string;
+    discount_type: DiscountType;
     is_featured: boolean;
     release_date: string;
     images: File[];
@@ -91,6 +94,7 @@ export default function ProductForm({
             purchase_price: '',
             discount_price: '',
             discount_percentage: '',
+            discount_type: 'percentage',
             is_featured: false,
             release_date: '',
             images: [],
@@ -319,6 +323,34 @@ export default function ProductForm({
                 )}
             </div>
 
+            <div className="grid gap-2">
+                <Label>Discount Type</Label>
+                <div className="flex w-fit rounded-md border border-input p-0.5">
+                    <button
+                        type="button"
+                        onClick={() => setData('discount_type', 'percentage')}
+                        className={`rounded-sm px-3 py-1 text-sm font-medium transition-colors ${
+                            data.discount_type === 'percentage'
+                                ? 'bg-primary text-primary-foreground'
+                                : 'text-muted-foreground'
+                        }`}
+                    >
+                        Percentage
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setData('discount_type', 'flat')}
+                        className={`rounded-sm px-3 py-1 text-sm font-medium transition-colors ${
+                            data.discount_type === 'flat'
+                                ? 'bg-primary text-primary-foreground'
+                                : 'text-muted-foreground'
+                        }`}
+                    >
+                        Flat Amount
+                    </button>
+                </div>
+            </div>
+
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <div className="grid gap-2">
                     <Label htmlFor="original_price">Selling Price (BDT)</Label>
@@ -329,14 +361,53 @@ export default function ProductForm({
                         value={data.original_price}
                         onChange={(e) => {
                             const nextOriginal = e.target.value;
+                            const original = Number(nextOriginal);
                             setData('original_price', nextOriginal);
+
+                            if (original <= 0) {
+                                return;
+                            }
+
+                            if (data.discount_type === 'flat') {
+                                // Keep the flat discount amount fixed and let the
+                                // resulting discount price move with the selling price.
+                                const previousOriginal = Number(
+                                    data.original_price,
+                                );
+                                const flatAmount =
+                                    data.discount_price !== '' &&
+                                    previousOriginal > 0
+                                        ? previousOriginal -
+                                          Number(data.discount_price)
+                                        : 0;
+
+                                if (data.discount_price !== '') {
+                                    const nextDiscountPrice = Math.max(
+                                        0,
+                                        original - flatAmount,
+                                    );
+                                    setData(
+                                        'discount_price',
+                                        String(nextDiscountPrice),
+                                    );
+                                    setData(
+                                        'discount_percentage',
+                                        String(
+                                            Math.round(
+                                                (flatAmount / original) *
+                                                    10000,
+                                            ) / 100,
+                                        ),
+                                    );
+                                }
+
+                                return;
+                            }
 
                             // Keep the discount price in sync with the selling price
                             // whenever a discount percentage is already set.
-                            const pct = Number(data.discount_percentage);
-                            const original = Number(nextOriginal);
-
-                            if (data.discount_percentage !== '' && original > 0) {
+                            if (data.discount_percentage !== '') {
+                                const pct = Number(data.discount_percentage);
                                 setData(
                                     'discount_price',
                                     String(
@@ -412,41 +483,97 @@ export default function ProductForm({
                     )}
                 </div>
 
-                <div className="grid gap-2">
-                    <Label htmlFor="discount_percentage">Discount %</Label>
-                    <Input
-                        id="discount_percentage"
-                        type="number"
-                        min={0}
-                        max={100}
-                        value={data.discount_percentage}
-                        onChange={(e) => {
-                            const nextPct = e.target.value;
-                            setData('discount_percentage', nextPct);
+                {data.discount_type === 'flat' ? (
+                    <div className="grid gap-2">
+                        <Label htmlFor="flat_discount_amount">
+                            Flat Discount (BDT)
+                        </Label>
+                        <Input
+                            id="flat_discount_amount"
+                            type="number"
+                            min={0}
+                            value={
+                                data.discount_price !== '' &&
+                                data.original_price !== ''
+                                    ? String(
+                                          Number(data.original_price) -
+                                              Number(data.discount_price),
+                                      )
+                                    : ''
+                            }
+                            onChange={(e) => {
+                                const nextFlat = e.target.value;
+                                const original = Number(data.original_price);
 
-                            const original = Number(data.original_price);
-                            const pct = Number(nextPct);
+                                if (nextFlat === '') {
+                                    setData('discount_price', '');
+                                    setData('discount_percentage', '');
+                                    return;
+                                }
 
-                            if (nextPct !== '' && original > 0) {
+                                const flatAmount = Number(nextFlat);
+                                const nextDiscountPrice = Math.max(
+                                    0,
+                                    original - flatAmount,
+                                );
                                 setData(
                                     'discount_price',
-                                    String(
-                                        Math.round(
-                                            original * (1 - pct / 100),
-                                        ),
-                                    ),
+                                    String(nextDiscountPrice),
                                 );
-                            } else if (nextPct === '') {
-                                setData('discount_price', '');
-                            }
-                        }}
-                    />
-                    {errors.discount_percentage && (
-                        <p className="text-xs text-destructive">
-                            {errors.discount_percentage}
-                        </p>
-                    )}
-                </div>
+
+                                if (original > 0) {
+                                    setData(
+                                        'discount_percentage',
+                                        String(
+                                            Math.round(
+                                                (flatAmount / original) *
+                                                    10000,
+                                            ) / 100,
+                                        ),
+                                    );
+                                }
+                            }}
+                        />
+                    </div>
+                ) : (
+                    <div className="grid gap-2">
+                        <Label htmlFor="discount_percentage">
+                            Discount %
+                        </Label>
+                        <Input
+                            id="discount_percentage"
+                            type="number"
+                            min={0}
+                            max={100}
+                            value={data.discount_percentage}
+                            onChange={(e) => {
+                                const nextPct = e.target.value;
+                                setData('discount_percentage', nextPct);
+
+                                const original = Number(data.original_price);
+                                const pct = Number(nextPct);
+
+                                if (nextPct !== '' && original > 0) {
+                                    setData(
+                                        'discount_price',
+                                        String(
+                                            Math.round(
+                                                original * (1 - pct / 100),
+                                            ),
+                                        ),
+                                    );
+                                } else if (nextPct === '') {
+                                    setData('discount_price', '');
+                                }
+                            }}
+                        />
+                        {errors.discount_percentage && (
+                            <p className="text-xs text-destructive">
+                                {errors.discount_percentage}
+                            </p>
+                        )}
+                    </div>
+                )}
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">

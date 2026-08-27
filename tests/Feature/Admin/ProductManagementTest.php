@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\DiscountType;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\OrderItem;
@@ -126,6 +127,48 @@ test('admin can set a custom size chart on a product', function () {
         ['size' => '41', 'us' => '8', 'uk' => '7', 'cm' => '26'],
         ['size' => '42', 'us' => '8.5', 'uk' => '7.5', 'cm' => '26.5'],
     ]);
+});
+
+test('admin can set a flat BDT discount instead of a percentage', function () {
+    $category = Category::factory()->create();
+    $brand = Brand::factory()->create();
+
+    $response = $this->actingAs(adminUser())->post(route('admin.products.store'), [
+        'name' => 'Flat Discount Shoe',
+        'slug' => 'flat-discount-shoe',
+        'category_id' => $category->id,
+        'brand_id' => $brand->id,
+        'original_price' => 5000,
+        'discount_price' => 4500,
+        'discount_percentage' => 10,
+        'discount_type' => 'flat',
+        'variants' => [['size' => '42', 'stock_quantity' => 10]],
+    ]);
+
+    $response->assertRedirect(route('admin.products.index'));
+
+    $product = Product::where('slug', 'flat-discount-shoe')->firstOrFail();
+
+    expect($product->discount_type)->toBe(DiscountType::Flat);
+    expect($product->discount_price)->toBe(4500);
+});
+
+test('a product defaults to percentage discount type when none is submitted', function () {
+    $category = Category::factory()->create();
+    $brand = Brand::factory()->create();
+
+    $this->actingAs(adminUser())->post(route('admin.products.store'), [
+        'name' => 'Default Discount Type Shoe',
+        'slug' => 'default-discount-type-shoe',
+        'category_id' => $category->id,
+        'brand_id' => $brand->id,
+        'original_price' => 5000,
+        'variants' => [['size' => '42', 'stock_quantity' => 10]],
+    ]);
+
+    $product = Product::where('slug', 'default-discount-type-shoe')->firstOrFail();
+
+    expect($product->discount_type)->toBe(DiscountType::Percentage);
 });
 
 test('admin can upload multiple images where the first is the main image', function () {

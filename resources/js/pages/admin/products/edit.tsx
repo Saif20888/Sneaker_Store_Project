@@ -15,6 +15,7 @@ type EditableProduct = {
     purchase_price: number | null;
     discount_price: number | null;
     discount_percentage: number | null;
+    discount_type: 'percentage' | 'flat';
     is_featured: boolean;
     release_date: string | null;
     images: string[];
@@ -67,6 +68,7 @@ export default function AdminProductsEdit({
                         discount_percentage: product.discount_percentage
                             ? String(product.discount_percentage)
                             : '',
+                        discount_type: product.discount_type,
                         is_featured: product.is_featured,
                         release_date: product.release_date ?? '',
                         existing_images: product.images,

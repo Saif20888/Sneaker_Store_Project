@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\DiscountType;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
@@ -124,4 +125,19 @@ test('catalog can be filtered to discounted products only', function () {
         ->has('products', 1)
         ->where('products.0.slug', $discounted->slug)
         ->where('products.0.discount_price', 3500));
+});
+
+test('a product card exposes its discount type for the flat-vs-percentage badge', function () {
+    $flat = Product::factory()->create([
+        'original_price' => 5000,
+        'discount_price' => 4500,
+        'discount_percentage' => 10,
+        'discount_type' => DiscountType::Flat,
+    ]);
+
+    $response = $this->get(route('products.index'));
+
+    $response->assertInertia(fn (Assert $page) => $page
+        ->where('products.0.slug', $flat->slug)
+        ->where('products.0.discount_type', 'flat'));
 });
