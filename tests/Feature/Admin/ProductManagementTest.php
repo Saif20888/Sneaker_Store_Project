@@ -101,6 +101,33 @@ test('admin can create a product with variants and images', function () {
     );
 });
 
+test('admin can set a custom size chart on a product', function () {
+    $category = Category::factory()->create();
+    $brand = Brand::factory()->create();
+
+    $response = $this->actingAs(adminUser())->post(route('admin.products.store'), [
+        'name' => 'Chart Test Shoe',
+        'slug' => 'chart-test-shoe',
+        'category_id' => $category->id,
+        'brand_id' => $brand->id,
+        'original_price' => 5000,
+        'size_chart' => [
+            ['size' => '41', 'us' => '8', 'uk' => '7', 'cm' => '26'],
+            ['size' => '42', 'us' => '8.5', 'uk' => '7.5', 'cm' => '26.5'],
+        ],
+        'variants' => [['size' => '42', 'stock_quantity' => 10]],
+    ]);
+
+    $response->assertRedirect(route('admin.products.index'));
+
+    $product = Product::where('slug', 'chart-test-shoe')->firstOrFail();
+
+    expect($product->size_chart)->toBe([
+        ['size' => '41', 'us' => '8', 'uk' => '7', 'cm' => '26'],
+        ['size' => '42', 'us' => '8.5', 'uk' => '7.5', 'cm' => '26.5'],
+    ]);
+});
+
 test('admin can upload multiple images where the first is the main image', function () {
     Storage::fake('public');
 

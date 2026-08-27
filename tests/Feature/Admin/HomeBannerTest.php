@@ -31,3 +31,15 @@ test('admin can clear a banner link', function () {
 
     expect($banner->fresh()->link)->toBeNull();
 });
+
+test('admin sees the site\'s default banners already imported, ready to edit or delete', function () {
+    // Seeded by the one-time seed_default_home_banners migration, so a fresh
+    // install's admin isn't stuck editing an empty list.
+    $response = $this->actingAs(adminUser())->get(route('admin.banners.index'));
+
+    $response->assertOk();
+    $response->assertInertia(fn ($page) => $page
+        ->component('admin/banners/index')
+        ->has('banners', 4)
+        ->where('banners.0.image', '/images/banners/banner-1.webp'));
+});

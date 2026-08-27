@@ -7,16 +7,25 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 
-const SIZE_CHART = [
-    { eu: '40', us: '7', uk: '6', cm: '25.5' },
-    { eu: '41', us: '8', uk: '7', cm: '26' },
-    { eu: '42', us: '8.5', uk: '7.5', cm: '26.5' },
-    { eu: '43', us: '9.5', uk: '8.5', cm: '27.5' },
-    { eu: '44', us: '10', uk: '9', cm: '28' },
-    { eu: '45', us: '11', uk: '10', cm: '29' },
+export const DEFAULT_SIZE_CHART = [
+    { size: '40', us: '7', uk: '6', cm: '25.5' },
+    { size: '41', us: '8', uk: '7', cm: '26' },
+    { size: '42', us: '8.5', uk: '7.5', cm: '26.5' },
+    { size: '43', us: '9.5', uk: '8.5', cm: '27.5' },
+    { size: '44', us: '10', uk: '9', cm: '28' },
+    { size: '45', us: '11', uk: '10', cm: '29' },
 ];
 
-export default function SizeGuideModal({ trigger }: { trigger: ReactNode }) {
+export type SizeChartRow = { size: string; us: string; uk: string; cm: string };
+
+type SizeGuideModalProps = {
+    trigger: ReactNode;
+    chart?: SizeChartRow[] | null;
+};
+
+export default function SizeGuideModal({ trigger, chart }: SizeGuideModalProps) {
+    const rows = chart && chart.length > 0 ? chart : DEFAULT_SIZE_CHART;
+
     return (
         <Dialog>
             <DialogTrigger asChild>{trigger}</DialogTrigger>
@@ -36,12 +45,14 @@ export default function SizeGuideModal({ trigger }: { trigger: ReactNode }) {
                         </tr>
                     </thead>
                     <tbody>
-                        {SIZE_CHART.map((row) => (
+                        {rows.map((row, index) => (
                             <tr
-                                key={row.eu}
+                                key={`${row.size}-${index}`}
                                 className="border-b border-store-gray/60"
                             >
-                                <td className="py-2 font-semibold">{row.eu}</td>
+                                <td className="py-2 font-semibold">
+                                    {row.size}
+                                </td>
                                 <td className="py-2">{row.us}</td>
                                 <td className="py-2">{row.uk}</td>
                                 <td className="py-2">{row.cm}</td>

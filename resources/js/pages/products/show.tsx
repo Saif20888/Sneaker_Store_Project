@@ -1,12 +1,13 @@
 import { Head } from '@inertiajs/react';
 import { MessageCircle, Minus, Plus } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import ImageMagnifier from '@/components/image-magnifier';
 import MobileAddToBagBar from '@/components/mobile-add-to-bag-bar';
 import PriceTag from '@/components/price-tag';
 import ProductCard from '@/components/product-card';
 import type { ProductCardData } from '@/components/product-card';
 import SizeGuideModal from '@/components/size-guide-modal';
+import type { SizeChartRow } from '@/components/size-guide-modal';
 import { Button } from '@/components/ui/button';
 import {
     Collapsible,
@@ -33,6 +34,7 @@ type ProductProps = {
         discount_price: number | null;
         discount_percentage: number | null;
         images: string[] | null;
+        size_chart: SizeChartRow[] | null;
         brand: string;
         category: string;
         release_date: string | null;
@@ -90,6 +92,14 @@ export default function ProductShow({ product, related }: ProductProps) {
     const [openAccordion, setOpenAccordion] = useState<string | null>(
         'Product Description',
     );
+    const sizeSectionRef = useRef<HTMLDivElement>(null);
+
+    const scrollToSizes = () => {
+        sizeSectionRef.current?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+        });
+    };
 
     const selectedVariant = useMemo(
         () =>
@@ -183,16 +193,17 @@ export default function ProductShow({ product, related }: ProductProps) {
                             />
                         </div>
 
-                        <div>
+                        <div ref={sizeSectionRef}>
                             <div className="mb-2 flex items-center justify-between">
                                 <span className="text-xs font-semibold tracking-wide uppercase">
                                     Select Size (EU)
                                 </span>
                                 <SizeGuideModal
+                                    chart={product.size_chart}
                                     trigger={
                                         <button
                                             type="button"
-                                            className="text-xs font-medium text-muted-foreground underline underline-offset-2"
+                                            className="text-xs font-semibold text-store-alert underline underline-offset-2"
                                         >
                                             Size Guide
                                         </button>
@@ -288,31 +299,43 @@ export default function ProductShow({ product, related }: ProductProps) {
                             )}
 
                         <div className="flex flex-col gap-2">
-                            <Button
-                                size="lg"
-                                className="hidden rounded-sm bg-store-ink text-store-bone hover:bg-store-ink/90 lg:inline-flex"
-                                disabled={
-                                    !selectedVariant ||
-                                    selectedVariant.stock_quantity <= 0
-                                }
-                                onClick={handleAddToBag}
-                            >
-                                {selectedVariant
-                                    ? 'Add to Bag'
-                                    : 'Select a Size'}
-                            </Button>
-                            <Button
-                                size="lg"
-                                variant="outline"
-                                className="hidden rounded-sm border-store-ink bg-white text-store-ink hover:bg-store-ink/5 hover:text-store-ink lg:inline-flex"
-                                disabled={
-                                    !selectedVariant ||
-                                    selectedVariant.stock_quantity <= 0
-                                }
-                                onClick={handleBuyNow}
-                            >
-                                {selectedVariant ? 'Buy Now' : 'Select a Size'}
-                            </Button>
+                            <div className="hidden lg:block">
+                                {selectedVariant ? (
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <Button
+                                            size="lg"
+                                            className="rounded-sm bg-store-ink text-store-bone hover:bg-store-ink/90"
+                                            disabled={
+                                                selectedVariant.stock_quantity <=
+                                                0
+                                            }
+                                            onClick={handleAddToBag}
+                                        >
+                                            Add to Bag
+                                        </Button>
+                                        <Button
+                                            size="lg"
+                                            variant="outline"
+                                            className="rounded-sm border-store-ink bg-white text-store-ink hover:bg-store-ink/5 hover:text-store-ink"
+                                            disabled={
+                                                selectedVariant.stock_quantity <=
+                                                0
+                                            }
+                                            onClick={handleBuyNow}
+                                        >
+                                            Buy Now
+                                        </Button>
+                                    </div>
+                                ) : (
+                                    <Button
+                                        size="lg"
+                                        className="w-full rounded-sm bg-store-ink text-store-bone hover:bg-store-ink/90"
+                                        onClick={scrollToSizes}
+                                    >
+                                        Select a Size
+                                    </Button>
+                                )}
+                            </div>
                             <Button
                                 asChild
                                 size="lg"
@@ -402,6 +425,7 @@ export default function ProductShow({ product, related }: ProductProps) {
                 }
                 onAddToBag={handleAddToBag}
                 onBuyNow={handleBuyNow}
+                onSelectSize={scrollToSizes}
             />
         </>
     );

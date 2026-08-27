@@ -2,6 +2,8 @@ import { useForm } from '@inertiajs/react';
 import { ImagePlus, Plus, Star, Trash2, X } from 'lucide-react';
 import { useRef, useState } from 'react';
 import type { FormEvent } from 'react';
+import { DEFAULT_SIZE_CHART } from '@/components/size-guide-modal';
+import type { SizeChartRow } from '@/components/size-guide-modal';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -30,6 +32,7 @@ type ProductFormValues = {
     images: File[];
     existing_images: string[];
     image_order: string[];
+    size_chart: SizeChartRow[];
     variants: VariantRow[];
 };
 
@@ -93,6 +96,7 @@ export default function ProductForm({
             images: [],
             existing_images: initialExistingImages,
             image_order: initialExistingImages.map(() => 'existing'),
+            size_chart: DEFAULT_SIZE_CHART.map((row) => ({ ...row })),
             variants: [{ size: '', stock_quantity: 0 }],
             ...initialValues,
         });
@@ -176,6 +180,33 @@ export default function ProductForm({
         setData(
             'variants',
             data.variants.filter((_, i) => i !== index),
+        );
+    };
+
+    const updateSizeChartRow = (
+        index: number,
+        field: keyof SizeChartRow,
+        value: string,
+    ) => {
+        setData(
+            'size_chart',
+            data.size_chart.map((row, i) =>
+                i === index ? { ...row, [field]: value } : row,
+            ),
+        );
+    };
+
+    const addSizeChartRow = () => {
+        setData('size_chart', [
+            ...data.size_chart,
+            { size: '', us: '', uk: '', cm: '' },
+        ]);
+    };
+
+    const removeSizeChartRow = (index: number) => {
+        setData(
+            'size_chart',
+            data.size_chart.filter((_, i) => i !== index),
         );
     };
 
@@ -577,6 +608,97 @@ export default function ProductForm({
                 {errors.variants && (
                     <p className="text-xs text-destructive">
                         {errors.variants}
+                    </p>
+                )}
+            </div>
+
+            <div className="grid gap-2">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <Label>Size Guide</Label>
+                        <p className="text-xs text-muted-foreground">
+                            Shown to customers on this product's page. Starts
+                            from the default chart — edit rows to match this
+                            specific shoe.
+                        </p>
+                    </div>
+                    <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={addSizeChartRow}
+                    >
+                        <Plus className="size-4" />
+                        Add Row
+                    </Button>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                    {data.size_chart.map((row, index) => (
+                        <div key={index} className="flex items-center gap-2">
+                            <Input
+                                placeholder="EU"
+                                value={row.size}
+                                onChange={(e) =>
+                                    updateSizeChartRow(
+                                        index,
+                                        'size',
+                                        e.target.value,
+                                    )
+                                }
+                                className="w-20"
+                            />
+                            <Input
+                                placeholder="US"
+                                value={row.us}
+                                onChange={(e) =>
+                                    updateSizeChartRow(
+                                        index,
+                                        'us',
+                                        e.target.value,
+                                    )
+                                }
+                                className="w-20"
+                            />
+                            <Input
+                                placeholder="UK"
+                                value={row.uk}
+                                onChange={(e) =>
+                                    updateSizeChartRow(
+                                        index,
+                                        'uk',
+                                        e.target.value,
+                                    )
+                                }
+                                className="w-20"
+                            />
+                            <Input
+                                placeholder="CM"
+                                value={row.cm}
+                                onChange={(e) =>
+                                    updateSizeChartRow(
+                                        index,
+                                        'cm',
+                                        e.target.value,
+                                    )
+                                }
+                                className="w-20"
+                            />
+                            <Button
+                                type="button"
+                                size="icon"
+                                variant="ghost"
+                                onClick={() => removeSizeChartRow(index)}
+                                aria-label="Remove row"
+                            >
+                                <Trash2 className="size-4" />
+                            </Button>
+                        </div>
+                    ))}
+                </div>
+                {errors.size_chart && (
+                    <p className="text-xs text-destructive">
+                        {errors.size_chart}
                     </p>
                 )}
             </div>

@@ -97,3 +97,56 @@ test('business report computes profit from purchase price, selling price, and co
     // orders contribute nothing rather than being treated as zero-margin.
     $response->assertInertia(fn (Assert $page) => $page->where('kpis.total_profit', 3880));
 });
+
+test('the business report defaults to a 30-day monthly window', function () {
+    $response = $this->actingAs(adminUser())->get(route('admin.reports.index'));
+
+    $response->assertInertia(fn (Assert $page) => $page
+        ->where('range.value', 'month')
+        ->has('trend', 30));
+});
+
+test('the business report can be scoped to a weekly window', function () {
+    $response = $this->actingAs(adminUser())->get(route('admin.reports.index', ['range' => 'week']));
+
+    $response->assertInertia(fn (Assert $page) => $page
+        ->where('range.value', 'week')
+        ->has('trend', 7));
+});
+
+test('the business report can be scoped to a yearly window', function () {
+    $response = $this->actingAs(adminUser())->get(route('admin.reports.index', ['range' => 'year']));
+
+    $response->assertInertia(fn (Assert $page) => $page
+        ->where('range.value', 'year')
+        ->has('trend', 365));
+});
+
+test('the business report can be scoped to a custom date range', function () {
+    Order::factory()->create(['status' => OrderStatus::Delivered, 'total_amount' => 1000, 'created_at' => '2026-01-15']);
+    Order::factory()->create(['status' => OrderStatus::Delivered, 'total_amount' => 2000, 'created_at' => '2026-03-01']);
+
+    $response = $this->actingAs(adminUser())->get(route('admin.reports.index', [
+        'range' => 'custom',
+        'from' => '2026-01-01',
+        'to' => '2026-01-31',
+    ]));
+
+    $response->assertInertia(fn (Assert $page) => $page
+        ->where('range.value', 'custom')
+        ->where('kpis.total_orders', 1)
+        ->where('kpis.total_revenue', 1000)
+        ->has('trend', 31));
+});
+
+test('an invalid custom range falls back to the monthly window', function () {
+    $response = $this->actingAs(adminUser())->get(route('admin.reports.index', [
+        'range' => 'custom',
+        'from' => '2026-05-01',
+        'to' => '2026-01-01',
+    ]));
+
+    $response->assertInertia(fn (Assert $page) => $page
+        ->where('range.value', 'month')
+        ->has('trend', 30));
+});

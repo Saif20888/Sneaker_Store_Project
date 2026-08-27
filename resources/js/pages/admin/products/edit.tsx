@@ -1,5 +1,7 @@
 import { Head } from '@inertiajs/react';
 import ProductForm from '@/components/admin/product-form';
+import { DEFAULT_SIZE_CHART } from '@/components/size-guide-modal';
+import type { SizeChartRow } from '@/components/size-guide-modal';
 import { update } from '@/routes/admin/products';
 
 type EditableProduct = {
@@ -16,6 +18,7 @@ type EditableProduct = {
     is_featured: boolean;
     release_date: string | null;
     images: string[];
+    size_chart: SizeChartRow[];
     variants: { id: number; size: string; stock_quantity: number }[];
 };
 
@@ -67,6 +70,12 @@ export default function AdminProductsEdit({
                         is_featured: product.is_featured,
                         release_date: product.release_date ?? '',
                         existing_images: product.images,
+                        size_chart:
+                            product.size_chart.length > 0
+                                ? product.size_chart
+                                : DEFAULT_SIZE_CHART.map((row) => ({
+                                      ...row,
+                                  })),
                         variants:
                             product.variants.length > 0
                                 ? product.variants

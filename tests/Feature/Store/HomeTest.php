@@ -57,6 +57,10 @@ test('home page best sellers are ordered by total stock and exclude out-of-stock
 });
 
 test('home page banners expose their click-through link', function () {
+    // Clear whatever the seed-default-banners migration inserted, so this test's
+    // count assertion is deterministic regardless of that one-time data migration.
+    HomeBanner::query()->delete();
+
     HomeBanner::factory()->create(['image' => '/storage/banners/a.jpg', 'link' => '/shop', 'position' => 0]);
     HomeBanner::factory()->create(['image' => '/storage/banners/b.jpg', 'link' => null, 'position' => 1]);
 

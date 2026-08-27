@@ -113,6 +113,7 @@ class ProductController extends Controller
                 'is_featured' => $product->is_featured,
                 'release_date' => $product->release_date?->toDateString(),
                 'images' => $product->images ?? [],
+                'size_chart' => $product->size_chart ?? [],
                 'variants' => $product->variants->map(fn ($variant) => [
                     'id' => $variant->id,
                     'size' => $variant->size,

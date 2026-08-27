@@ -17,6 +17,9 @@ test('non-admin users cannot access admin banner routes', function () {
 });
 
 test('admin can view the banner list', function () {
+    // Clear the default banners the seed-default-banners migration inserts, so this
+    // test's count assertion is deterministic regardless of that one-time data migration.
+    HomeBanner::query()->delete();
     HomeBanner::factory()->count(2)->create();
 
     $response = $this->actingAs(adminUser())->get(route('admin.banners.index'));
@@ -30,6 +33,7 @@ test('admin can view the banner list', function () {
 test('admin can upload multiple banners at once, appended to the end of the order', function () {
     Storage::fake('public');
 
+    HomeBanner::query()->delete();
     HomeBanner::factory()->create(['position' => 0]);
 
     $response = $this->actingAs(adminUser())->post(route('admin.banners.store'), [
@@ -45,6 +49,8 @@ test('admin can upload multiple banners at once, appended to the end of the orde
 });
 
 test('uploading a banner requires at least one image', function () {
+    HomeBanner::query()->delete();
+
     $response = $this->actingAs(adminUser())->post(route('admin.banners.store'), [
         'images' => [],
     ]);
@@ -54,6 +60,7 @@ test('uploading a banner requires at least one image', function () {
 });
 
 test('admin can reorder banners', function () {
+    HomeBanner::query()->delete();
     $first = HomeBanner::factory()->create(['position' => 0]);
     $second = HomeBanner::factory()->create(['position' => 1]);
 
@@ -67,6 +74,7 @@ test('admin can reorder banners', function () {
 });
 
 test('reordering rejects a submission that omits an existing banner', function () {
+    HomeBanner::query()->delete();
     $first = HomeBanner::factory()->create(['position' => 0]);
     $second = HomeBanner::factory()->create(['position' => 1]);
     HomeBanner::factory()->create(['position' => 2]);

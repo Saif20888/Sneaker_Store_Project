@@ -8,6 +8,7 @@ type MobileAddToBagBarProps = {
     disabled: boolean;
     onAddToBag: () => void;
     onBuyNow: () => void;
+    onSelectSize: () => void;
 };
 
 export default function MobileAddToBagBar({
@@ -17,33 +18,44 @@ export default function MobileAddToBagBar({
     disabled,
     onAddToBag,
     onBuyNow,
+    onSelectSize,
 }: MobileAddToBagBarProps) {
     return (
         <div className="fixed inset-x-0 bottom-0 z-40 flex flex-col gap-2 border-t border-store-gray bg-store-bone/95 px-4 py-3 [padding-bottom:calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur lg:hidden">
-            <div className="flex items-center gap-3">
-                <PriceTag
-                    originalPrice={originalPrice}
-                    discountPrice={discountPrice}
-                    className="shrink-0 text-base"
-                />
+            <PriceTag
+                originalPrice={originalPrice}
+                discountPrice={discountPrice}
+                className="text-base"
+            />
+            {selected ? (
+                <div className="grid grid-cols-2 gap-2">
+                    <Button
+                        size="lg"
+                        className="rounded-sm bg-store-ink text-store-bone hover:bg-store-ink/90"
+                        disabled={disabled}
+                        onClick={onAddToBag}
+                    >
+                        Add to Bag
+                    </Button>
+                    <Button
+                        size="lg"
+                        variant="outline"
+                        className="rounded-sm border-store-ink bg-white text-store-ink hover:bg-store-ink/5 hover:text-store-ink"
+                        disabled={disabled}
+                        onClick={onBuyNow}
+                    >
+                        Buy Now
+                    </Button>
+                </div>
+            ) : (
                 <Button
                     size="lg"
-                    variant="outline"
-                    className="flex-1 rounded-sm border-store-ink bg-white text-store-ink hover:bg-store-ink/5 hover:text-store-ink"
-                    disabled={disabled}
-                    onClick={onAddToBag}
+                    className="w-full rounded-sm bg-store-ink text-store-bone hover:bg-store-ink/90"
+                    onClick={onSelectSize}
                 >
-                    {selected ? 'Add to Bag' : 'Select a Size'}
+                    Select a Size
                 </Button>
-            </div>
-            <Button
-                size="lg"
-                className="rounded-sm bg-store-ink text-store-bone hover:bg-store-ink/90"
-                disabled={disabled}
-                onClick={onBuyNow}
-            >
-                Buy Now
-            </Button>
+            )}
         </div>
     );
 }

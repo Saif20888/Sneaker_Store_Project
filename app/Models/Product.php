@@ -23,6 +23,7 @@ use Illuminate\Support\Carbon;
  * @property int|null $discount_price
  * @property float|null $discount_percentage
  * @property array<int, string>|null $images
+ * @property array<int, array{size: string, us: string, uk: string, cm: string}>|null $size_chart
  * @property bool $is_featured
  * @property bool $is_trending
  * @property Carbon|null $release_date
@@ -32,7 +33,7 @@ use Illuminate\Support\Carbon;
  * @property-read Brand $brand
  * @property-read Collection<int, ProductVariant> $variants
  */
-#[Fillable(['category_id', 'brand_id', 'name', 'slug', 'description', 'original_price', 'purchase_price', 'discount_price', 'discount_percentage', 'images', 'is_featured', 'is_trending', 'release_date'])]
+#[Fillable(['category_id', 'brand_id', 'name', 'slug', 'description', 'original_price', 'purchase_price', 'discount_price', 'discount_percentage', 'images', 'size_chart', 'is_featured', 'is_trending', 'release_date'])]
 class Product extends Model
 {
     /** @use HasFactory<ProductFactory> */
@@ -121,6 +122,7 @@ class Product extends Model
     {
         return [
             'images' => 'array',
+            'size_chart' => 'array',
             'is_featured' => 'boolean',
             'is_trending' => 'boolean',
             'release_date' => 'date',

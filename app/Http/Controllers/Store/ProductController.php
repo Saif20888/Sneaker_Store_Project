@@ -128,6 +128,7 @@ class ProductController extends Controller
             'discount_price' => $product->isDiscounted() ? $product->discount_price : null,
             'discount_percentage' => $product->isDiscounted() ? $product->discount_percentage : null,
             'images' => $product->images,
+            'size_chart' => $product->size_chart,
             'brand' => $product->brand->name,
             'category' => $product->category->name,
             'release_date' => $product->release_date?->toDateString(),
