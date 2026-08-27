@@ -87,6 +87,7 @@ const ACCORDIONS = (description: string | null) => [
 export default function ProductShow({ product, related }: ProductProps) {
     const { addItem, buyNow, openCart } = useCart();
     const [selectedSize, setSelectedSize] = useState<string | null>(null);
+    const [sizeError, setSizeError] = useState(false);
     const [activeImage, setActiveImage] = useState(0);
     const [quantity, setQuantity] = useState(1);
     const [openAccordion, setOpenAccordion] = useState<string | null>(
@@ -112,7 +113,12 @@ export default function ProductShow({ product, related }: ProductProps) {
     const maxQuantity = Math.min(selectedVariant?.stock_quantity ?? 5, 5);
 
     const handleAddToBag = () => {
-        if (!selectedVariant || selectedVariant.stock_quantity <= 0) {
+        if (!selectedVariant) {
+            setSizeError(true);
+            scrollToSizes();
+            return;
+        }
+        if (selectedVariant.stock_quantity <= 0) {
             return;
         }
 
@@ -121,7 +127,12 @@ export default function ProductShow({ product, related }: ProductProps) {
     };
 
     const handleBuyNow = () => {
-        if (!selectedVariant || selectedVariant.stock_quantity <= 0) {
+        if (!selectedVariant) {
+            setSizeError(true);
+            scrollToSizes();
+            return;
+        }
+        if (selectedVariant.stock_quantity <= 0) {
             return;
         }
 
@@ -225,6 +236,7 @@ export default function ProductShow({ product, related }: ProductProps) {
                                             onClick={() => {
                                                 setSelectedSize(variant.size);
                                                 setQuantity(1);
+                                                setSizeError(false);
                                             }}
                                             className={`relative rounded-sm border py-2.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-30 ${
                                                 isSelected
@@ -253,6 +265,11 @@ export default function ProductShow({ product, related }: ProductProps) {
                                         This size is sold out.
                                     </p>
                                 )}
+                            {sizeError && !selectedVariant && (
+                                <p className="mt-2 text-xs font-semibold text-store-alert">
+                                    Please select a size.
+                                </p>
+                            )}
                         </div>
 
                         {selectedVariant &&
@@ -299,42 +316,30 @@ export default function ProductShow({ product, related }: ProductProps) {
                             )}
 
                         <div className="flex flex-col gap-2">
-                            <div className="hidden lg:block">
-                                {selectedVariant ? (
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <Button
-                                            size="lg"
-                                            className="rounded-sm bg-store-ink text-store-bone hover:bg-store-ink/90"
-                                            disabled={
-                                                selectedVariant.stock_quantity <=
-                                                0
-                                            }
-                                            onClick={handleAddToBag}
-                                        >
-                                            Add to Bag
-                                        </Button>
-                                        <Button
-                                            size="lg"
-                                            variant="outline"
-                                            className="rounded-sm border-store-ink bg-white text-store-ink hover:bg-store-ink/5 hover:text-store-ink"
-                                            disabled={
-                                                selectedVariant.stock_quantity <=
-                                                0
-                                            }
-                                            onClick={handleBuyNow}
-                                        >
-                                            Buy Now
-                                        </Button>
-                                    </div>
-                                ) : (
-                                    <Button
-                                        size="lg"
-                                        className="w-full rounded-sm bg-store-ink text-store-bone hover:bg-store-ink/90"
-                                        onClick={scrollToSizes}
-                                    >
-                                        Select a Size
-                                    </Button>
-                                )}
+                            <div className="hidden grid-cols-2 gap-2 lg:grid">
+                                <Button
+                                    size="lg"
+                                    className="rounded-sm bg-store-ink text-store-bone hover:bg-store-ink/90"
+                                    disabled={
+                                        !!selectedVariant &&
+                                        selectedVariant.stock_quantity <= 0
+                                    }
+                                    onClick={handleAddToBag}
+                                >
+                                    Add to Bag
+                                </Button>
+                                <Button
+                                    size="lg"
+                                    variant="outline"
+                                    className="rounded-sm border-store-ink bg-white text-store-ink hover:bg-store-ink/5 hover:text-store-ink"
+                                    disabled={
+                                        !!selectedVariant &&
+                                        selectedVariant.stock_quantity <= 0
+                                    }
+                                    onClick={handleBuyNow}
+                                >
+                                    Buy Now
+                                </Button>
                             </div>
                             <Button
                                 asChild
@@ -419,13 +424,11 @@ export default function ProductShow({ product, related }: ProductProps) {
             <MobileAddToBagBar
                 originalPrice={product.original_price}
                 discountPrice={product.discount_price}
-                selected={!!selectedVariant}
                 disabled={
-                    !selectedVariant || selectedVariant.stock_quantity <= 0
+                    !!selectedVariant && selectedVariant.stock_quantity <= 0
                 }
                 onAddToBag={handleAddToBag}
                 onBuyNow={handleBuyNow}
-                onSelectSize={scrollToSizes}
             />
         </>
     );
