@@ -551,8 +551,13 @@ function StoreFooter() {
                     </div>
                 </div>
 
-                <div className="mt-8 flex flex-col gap-3 border-t border-store-bone/10 pt-6 text-xs text-store-bone/50 sm:flex-row sm:items-center sm:justify-between">
-                    <p>CopyRight {new Date().getFullYear()} Vintedge</p>
+                <div className="mt-8 flex flex-col gap-3 border-t border-store-bone/10 pt-6 text-xs text-store-bone/50 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                        <p>CopyRight {new Date().getFullYear()} Vintedge</p>
+                        <p className="mt-1 text-store-bone/40">
+                            Developed by Saif Shahriar Hossain
+                        </p>
+                    </div>
                     <nav className="flex gap-4">
                         <Link
                             href={termsPage()}
@@ -568,10 +573,6 @@ function StoreFooter() {
                         </Link>
                     </nav>
                 </div>
-
-                <p className="mt-4 text-center text-xs text-store-bone/40">
-                    Developed by Saif Shahriar Hossain
-                </p>
             </div>
         </footer>
     );
