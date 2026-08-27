@@ -568,6 +568,10 @@ function StoreFooter() {
                         </Link>
                     </nav>
                 </div>
+
+                <p className="mt-4 text-center text-xs text-store-bone/40">
+                    Developed by Saif Shahriar Hossain
+                </p>
             </div>
         </footer>
     );
