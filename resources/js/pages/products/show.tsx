@@ -1,6 +1,6 @@
 import { Head } from '@inertiajs/react';
 import { MessageCircle, Minus, Plus } from 'lucide-react';
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import ImageMagnifier from '@/components/image-magnifier';
 import MobileAddToBagBar from '@/components/mobile-add-to-bag-bar';
 import PriceTag from '@/components/price-tag';
@@ -93,15 +93,6 @@ export default function ProductShow({ product, related }: ProductProps) {
     const [openAccordion, setOpenAccordion] = useState<string | null>(
         'Product Description',
     );
-    const sizeSectionRef = useRef<HTMLDivElement>(null);
-
-    const scrollToSizes = () => {
-        sizeSectionRef.current?.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start',
-        });
-    };
-
     const selectedVariant = useMemo(
         () =>
             product.variants.find((variant) => variant.size === selectedSize) ??
@@ -115,7 +106,6 @@ export default function ProductShow({ product, related }: ProductProps) {
     const handleAddToBag = () => {
         if (!selectedVariant) {
             setSizeError(true);
-            scrollToSizes();
             return;
         }
         if (selectedVariant.stock_quantity <= 0) {
@@ -129,7 +119,6 @@ export default function ProductShow({ product, related }: ProductProps) {
     const handleBuyNow = () => {
         if (!selectedVariant) {
             setSizeError(true);
-            scrollToSizes();
             return;
         }
         if (selectedVariant.stock_quantity <= 0) {
@@ -204,7 +193,7 @@ export default function ProductShow({ product, related }: ProductProps) {
                             />
                         </div>
 
-                        <div ref={sizeSectionRef}>
+                        <div>
                             <div className="mb-2 flex items-center justify-between">
                                 <span className="text-xs font-semibold tracking-wide uppercase">
                                     Select Size (EU)
