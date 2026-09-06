@@ -216,10 +216,10 @@ export default function AdminReportsIndex({
                             {trend.map((point) => (
                                 <div
                                     key={point.date}
-                                    className="group relative flex-1"
+                                    className="group relative h-full flex-1"
                                 >
                                     <div
-                                        className="w-full rounded-t-sm bg-store-ink/80 transition-colors group-hover:bg-store-alert"
+                                        className="absolute bottom-0 w-full rounded-t-sm bg-store-ink/80 transition-colors group-hover:bg-store-alert"
                                         style={{
                                             height: `${Math.max(2, (point.revenue / maxRevenue) * 100)}%`,
                                         }}
